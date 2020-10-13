@@ -5,6 +5,12 @@ auto upload caption
 https://github.com/SigureMo/bilili
 https://github.com/agermanidis/autosub
 
+TOOD
+- [ ] 自动下载链接的视频
+- [ ] 使用 autosub 获取字幕
+- [ ] 将 srt 字幕转换为 bcc 字幕
+- [x] 通过 subtitle 接口上传字幕
+
 # API 链接
 
 > https://api.bilibili.com/x/v2/dm/subtitle/draft/save
