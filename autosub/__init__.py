@@ -74,7 +74,7 @@ class SpeechRecognizer(object):
                 except requests.exceptions.ConnectionError:
                     continue
 
-                for line in resp.content.split("\n"):
+                for line in resp.content.decode().split("\n"):
                     try:
                         line = json.loads(line)
                         line = line['result'][0]['alternative'][0]['transcript']
