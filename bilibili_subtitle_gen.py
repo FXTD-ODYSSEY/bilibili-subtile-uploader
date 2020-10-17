@@ -7,17 +7,19 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
-__author__ = 'timmyliang'
-__email__ = '820472580@qq.com'
-__date__ = '2020-10-17 22:13:40'
+__author__ = "timmyliang"
+__email__ = "820472580@qq.com"
+__date__ = "2020-10-17 22:13:40"
 
 
 import os
+import re
+import sys
 import json
-import codecs
 import tempfile
 import requests
 import contextlib
+import subprocess
 
 from urllib import parse
 
@@ -68,25 +70,25 @@ class ConfigDumperMixin(object):
         path = path if path else self.config_path
         data = {var: getattr(self, var).get() for var in self.get_tkinter_varaible()}
         with open(path, "w") as f:
-            json.dump(data, f,indent=4, ensure_ascii=False)
+            json.dump(data, f, indent=4, ensure_ascii=False)
 
 
 class ListVar(tk.Variable):
     @property
-    def dict_data(self):
-        return self._dict_data
+    def list_data(self):
+        return self._list_data
 
-    @dict_data.setter
-    def dict_data(self, data):
-        self._dict_data = data if isinstance(data, list) else []
+    @list_data.setter
+    def list_data(self, data):
+        self._list_data = data if isinstance(data, list) else []
 
     def set(self, val):
-        val = next(iter(self._dict_data[val:]), "")
+        val = next(iter(self._list_data[val:]), "")
         return super(ListVar, self).set(val)
 
     def get(self):
         val = super(ListVar, self).get()
-        return self._dict_data.index(val)
+        return self._list_data.index(val)
 
 
 @contextlib.contextmanager
@@ -121,11 +123,21 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
         menubar.add_cascade(label="帮助", menu=filemenu)
         parent.config(menu=menubar)
 
+        self.Cookie = tk.StringVar()
+        self.Cookie.trace("w", self.dump_config)
+
+        self.lang_index = ListVar()
+        self.lang_index.list_data = self.LANG_LIST
+        self.lang_index.set(0)
+
+        self.bv = tk.StringVar()
+        self.bv.trace("w", self.dump_config)
+
         with TKFrame(side="top", fill="x", padx=5, pady=5) as Main_Frame:
             with TKFrame(side="top", fill="x", padx=15, pady=5) as Cookie_Frame:
-                tk.Label(Cookie_Frame, text="登陆 Cookie").grid(row=0, column=0, sticky="nsew")
-                self.Cookie = tk.StringVar()
-                self.Cookie.trace('w', self.dump_config)
+                tk.Label(Cookie_Frame, text="登陆 Cookie").grid(
+                    row=0, column=0, sticky="nsew"
+                )
                 entry = tk.Entry(Cookie_Frame, textvariable=self.Cookie)
                 entry.grid(row=0, column=1, sticky="nsew")
                 Cookie_Frame.grid_columnconfigure(1, weight=1)
@@ -133,11 +145,9 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
             with TKFrame(side="top", fill="x", padx=15) as Lang_Frame:
                 label = tk.Label(Lang_Frame, text="选择语言")
                 label.grid(row=0, column=0, sticky="nsew")
-                self.combo_index = ListVar()
-                self.combo_index.dict_data = self.LANG_LIST
-                self.combo_index.set(0)
+
                 lang_combo = ttk.Combobox(
-                    Lang_Frame, textvariable=self.combo_index, state="readonly"
+                    Lang_Frame, textvariable=self.lang_index, state="readonly"
                 )
                 lang_combo.grid(row=0, column=1, sticky="nsew")
                 lang_combo["values"] = self.LANG_LIST
@@ -146,8 +156,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
 
             with TKFrame(side="top", fill="x", padx=15, pady=5) as BV_Frame:
                 tk.Label(BV_Frame, text="BV 号").grid(row=0, column=0, sticky="nsew")
-                self.bv = tk.StringVar()
-                self.bv.trace('w', self.dump_config)
+
                 entry = tk.Entry(BV_Frame, textvariable=self.bv)
                 entry.grid(row=0, column=1, sticky="nsew")
                 BV_Frame.grid_columnconfigure(1, weight=1)
@@ -161,6 +170,13 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
 
     @classmethod
     def parse_srt(cls, srt_path):
+        """parse_srt 将 srt 转换为 bcc B站字幕格式
+
+        :param srt_path: srt 路径
+        :type srt_path: srt
+        :return: bcc json 数据
+        :rtype: srt
+        """
         bcc = {
             "font_size": 0.4,
             "font_color": "#FFFFFF",
@@ -185,6 +201,8 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
             self.help_win.destroy()
         self.help_win = tk.Toplevel(self.parent)
         self.help_win.title("使用说明")
+        text = "Cookie 通过登陆在浏览器控制台中获取"
+        tk.Label(self.help_win, text=text).pack(side="top", fill="x", padx=5, pady=5)
         text = "自动将 srt 字幕转换为 bcc 字幕上传到 B 站"
         tk.Label(self.help_win, text=text).pack(side="top", fill="x", padx=5, pady=5)
 
@@ -192,7 +210,48 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
         self.parent.destroy()
 
     def run(self):
-        pass
+        # TODO 检查输入是否合法
+        self.download_video()
+        # TODO 查询下载的视频对应的 oid
+        # TODO 调用 autosub 进行视频字幕生成
+        # subprocess.call([sys.executable,'autosub/__init__.py',srt])
+        # TODO 调用字幕 API 上传字幕文件
+        
+        print("downlaod complete")
+
+    @property
+    def bvid(self):
+        bv = self.bv.get()
+        return (
+            [
+                v
+                for v in re.split(r"/|\\|\?", bv)
+                if v.lower().startswith("bv") or v.lower().startswith("av")
+            ][-1]
+            if bv.startswith("http")
+            else bv
+        )
+
+    def download_video(self):
+
+        output_path = os.path.join(__file__, "..", "video")
+        if not os.path.exists(output_path):
+            os.mkdir(output_path)
+        subprocess.call(
+            [
+                "bilili",
+                f"https://www.bilibili.com/video/{self.bvid}",
+                "-d",
+                f"{output_path}",
+                "-y",
+                "--danmaku",
+                "no",
+                "--playlist-type",
+                "no",
+                "-q",
+                "16",
+            ]
+        )
 
     def submit_subtitle(self):
 
@@ -201,7 +260,8 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
             Cookie = json.load(f)
 
         csrf = ""
-        for line in Cookie.get("Cookie").split(";"):
+        cookie = self.Cookie.get()
+        for line in cookie.split(";"):
             line = line.strip()
             if line.startswith("bili_jct="):
                 bili_jct = line[len("bili_jct=") :]
@@ -215,10 +275,9 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
         subtitle = """{"font_size":0.4,"font_color":"#FFFFFF","background_alpha":0.5,"background_color":"#9C27B0","Stroke":"none","body":[{"from":4.19,"to":5.93,"location":2,"content":"Hire one."},{"from":6.13,"to":12.43,"location":2,"content":"Annd welcome to the set up section where I'll walk you through the steps in order to get started with"},{"from":12.49,"to":15.57,"location":2,"content":"coding for engine for at this point."},{"from":15.58,"to":19.46,"location":2,"content":"I assume you already have the engine installed and ready to go."},{"from":19.66,"to":26.2,"location":2,"content":"So I'll focus on setting up Visual Studio and highly recommended visual assist plugin which will significantly"},{"from":26.2,"to":30.71,"location":2,"content":"improve your quality of life when coding with C++ throughout the course."},{"from":30.73,"to":37.42,"location":2,"content":"I'll be using visualises for Intellisense and certain navigation Akis if you don't get Ulysses yet you"},{"from":37.42,"to":40.91,"location":2,"content":"can try the trial version for free in case you're wondering."},{"from":40.98,"to":46.79,"location":2,"content":"I will be using Unreal engine for 1:17 for of this course using a later version of the engine is OK"},{"from":46.84,"to":53.68,"location":2,"content":"but keep in mind that the look of the windows may change or that small API changes in C++ moniker to"},{"from":53.68,"to":54.67,"location":2,"content":"be absolutely safe."},{"from":54.67,"to":56.17,"location":2,"content":"Please use Fortran 17."},{"from":56.17,"to":61.36,"location":2,"content":"And please do notify me of any changes or issues you run into by posting in the Q and A board."},{"from":61.39,"to":66.76,"location":2,"content":"I will do my best to keep the videos up to date ones later additions of the engine are released and"},{"from":66.93,"to":70.86,"location":2,"content":"your help in pointing out inconsistencies will be greatly appreciated."}]}"""
 
         csrf = bili_jct
-        bvid = "BV1Cv411k7iN"
         oid = "244626685"
-        lan = "en-US"
-        payload = f'lan={lan}&submit=true&csrf={csrf}&sign=false&bvid={bvid}&type=1&oid={oid}&{parse.urlencode({"data":subtitle})}'
+        lang = self.lang_index.list_data[self.lang_index.get()]
+        payload = f'lan={lang}&submit=true&csrf={csrf}&sign=false&bvid={self.bvid}&type=1&oid={oid}&{parse.urlencode({"data":subtitle})}'
 
         headers = {
             # "referer": "https://account.bilibili.com/subtitle/edit/",
