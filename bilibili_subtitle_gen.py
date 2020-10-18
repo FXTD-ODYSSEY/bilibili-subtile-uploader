@@ -70,6 +70,7 @@ class ConfigDumperMixin(object):
         path = path if path else self.config_path
         data = {var: getattr(self, var).get() for var in self.get_tkinter_varaible()}
         with open(path, "w") as f:
+            # f.write(json.dumps(data))
             json.dump(data, f, indent=4, ensure_ascii=False)
 
 
@@ -89,6 +90,13 @@ class ListVar(tk.Variable):
     def get(self):
         val = super(ListVar, self).get()
         return self._list_data.index(val)
+
+
+@contextlib.contextmanager
+def TKFrame(*args, **kwargs):
+    Frame = tk.Frame()
+    yield Frame
+    Frame.pack(**kwargs)
 
 
 @contextlib.contextmanager
@@ -123,8 +131,8 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
         menubar.add_cascade(label="帮助", menu=filemenu)
         parent.config(menu=menubar)
 
-        self.Cookie = tk.StringVar()
-        self.Cookie.trace("w", self.dump_config)
+        self.cookie = tk.StringVar()
+        self.cookie.trace("w", self.dump_config)
 
         self.lang_index = ListVar()
         self.lang_index.list_data = self.LANG_LIST
@@ -133,12 +141,15 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
         self.bv = tk.StringVar()
         self.bv.trace("w", self.dump_config)
 
+        self.proxy = tk.StringVar()
+        self.proxy.trace("w", self.dump_config)
+
         with TKFrame(side="top", fill="x", padx=5, pady=5) as Main_Frame:
             with TKFrame(side="top", fill="x", padx=15, pady=5) as Cookie_Frame:
                 tk.Label(Cookie_Frame, text="登陆 Cookie").grid(
                     row=0, column=0, sticky="nsew"
                 )
-                entry = tk.Entry(Cookie_Frame, textvariable=self.Cookie)
+                entry = tk.Entry(Cookie_Frame, textvariable=self.cookie)
                 entry.grid(row=0, column=1, sticky="nsew")
                 Cookie_Frame.grid_columnconfigure(1, weight=1)
 
@@ -161,6 +172,15 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
                 entry.grid(row=0, column=1, sticky="nsew")
                 BV_Frame.grid_columnconfigure(1, weight=1)
 
+            with TKFrame(side="top", fill="x", padx=15, pady=5) as BV_Frame:
+                tk.Label(BV_Frame, text="代理地址(空值则不代理)").grid(
+                    row=0, column=0, sticky="nsew"
+                )
+
+                entry = tk.Entry(BV_Frame, textvariable=self.proxy)
+                entry.grid(row=0, column=1, sticky="nsew")
+                BV_Frame.grid_columnconfigure(1, weight=1)
+
             gen_btn = tk.Button(Main_Frame, text="自动生成并上传字幕", command=self.run)
             gen_btn.pack(side="top", fill="x", padx=5)
 
@@ -178,7 +198,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
         :rtype: srt
         """
         subs = pysrt.open(srt_path)
-        return {
+        bcc = {
             "font_size": 0.4,
             "font_color": "#FFFFFF",
             "background_alpha": 0.5,
@@ -193,7 +213,8 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
                 }
                 for sub in subs
             ],
-        } if subs else {}
+        }
+        return bcc if subs else {}
 
     def helpWin(self):
         # NOTE 删除重复的窗口
@@ -210,57 +231,73 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
         self.parent.destroy()
 
     def run(self):
+
         # Note 检查输入是否合法
         bv = self.bv.get()
         lang = self.lang_index.get()
-        cookie = self.Cookie.get()
+        cookie = self.cookie.get()
+
         if not bv or not cookie:
-            tk.messagebox.showwarning("警告","缺少输入参数")
+            msg = "缺少输入参数"
+            print(msg)
+            tk.messagebox.showwarning("警告", msg)
             return
-        
+
         for line in cookie.split(";"):
             line = line.strip()
             if line.startswith("bili_jct="):
                 self.bili_jct = line[len("bili_jct=") :]
                 break
         else:
-            tk.messagebox.showwarning("警告","缺少 bili_jct 值")
+            msg = "缺少 bili_jct 值"
+            print(msg)
+            tk.messagebox.showwarning("警告", msg)
             return
-        
-        autosub = os.path.join(__file__,'..','autosub','autosub.exe')
+
+        autosub = os.path.join(__file__, "..", "autosub", "autosub.exe")
         if not os.path.isfile(autosub):
-            tk.messagebox.showwarning("警告",f"{autosub} 路径不存在\n请到 https://github.com/BingLingGroup/autosub/releases 页面下载最新版本的 autosub.exe 程序")
+            msg = f"{autosub} 路径不存在\n请到 https://github.com/BingLingGroup/autosub/releases 页面下载最新版本的 autosub.exe 程序"
+            print(msg)
+            tk.messagebox.showwarning("警告", msg)
             return
-            
+
         # NOTE 查询下载的视频对应的 oid
         info = self.get_video_info()
-        
-        # # NOTE 下载视频
-        # self.download_video()
 
-        # NOTE 修改视频名称为 oid 
+        # NOTE 下载视频
+        self.download_video()
+
+        # NOTE 修改视频名称为 oid
         title = info.get("title")
         pages = info.get("pages")
-        
-        video = os.path.join(__file__, "..","video",f"{title} - bilibili","Videos")
 
-        for p,oid in pages.items():
-            src = os.path.join(video,f"{p}.mp4")
-            dst = os.path.join(video,f"{oid}.mp4")
+        video = os.path.join(__file__, "..", "video", f"{title} - bilibili", "Videos")
+
+        proxy = self.proxy.get()
+        for p, oid in pages.items():
+            src = os.path.join(video, f"{p}.mp4")
             if not os.path.isfile(src):
                 continue
-            os.rename(src,dst)
-            dst = os.path.abspath(dst)
-            
+
             # NOTE 调用 autosub 进行视频字幕生成
-            command = " ".join([autosub,'-i',f'"{dst}"','-S',self.lang])
-            print(command)
+            args = [autosub, "-i", f'"{src}"', "-S", self.lang]
+            args.extend(["-hsp", proxy]) if proxy.startswith("http") else None
+
+            command = " ".join(args)
+
+            src = os.path.join(video, f"{p}.{self.lang.lower()}.srt")
+            os.remove(src) if os.path.isfile(src) else None
+
             subprocess.call(command)
-            srt_path = os.path.join(video,f"{oid}.{self.lang.lower()}.srt")
-            print(srt_path)
-            # self.submit_subtitle(srt_path,cookie)
-        
-        print("downlaod complete")
+
+            srt_path = os.path.join(video, f"{oid}.srt")
+            os.remove(srt_path) if os.path.isfile(srt_path) else None
+
+            os.rename(src, srt_path)
+
+            self.submit_subtitle(srt_path)
+
+        tk.messagebox.showinfo("恭喜你", f"{bv} 字幕上传成功")
 
     @property
     def bvid(self):
@@ -274,22 +311,22 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
             if bv.startswith("http")
             else bv
         )
-        
+
     @property
     def lang(self):
         return self.lang_index.list_data[self.lang_index.get()]
 
-    def get_video_info(self,bvid=""):
+    def get_video_info(self, bvid=""):
         bvid = bvid if bvid else self.bvid
         url = f"http://api.bilibili.com/x/web-interface/view?bvid={bvid}"
 
         response = requests.request("GET", url)
 
-        data = json.loads(response.text.encode('utf8')).get("data",{})
-        
+        data = json.loads(response.text.encode("utf8")).get("data", {})
+
         return {
             "title": data.get("title"),
-            "pages": {p.get("part"):p.get("cid") for p in data.get("pages",{})},
+            "pages": {p.get("part"): p.get("cid") for p in data.get("pages", {})},
         }
 
     def download_video(self):
@@ -313,7 +350,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
             ]
         )
 
-    def submit_subtitle(self,srt_path,cookie):
+    def submit_subtitle(self, srt_path):
 
         oid = os.path.splitext(os.path.basename(srt_path))[0]
         subtitle = self.parse_srt(srt_path)
@@ -321,7 +358,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
             print(f"{oid}.srt 文件为空 - 跳过")
             return
         subtitle = json.dumps(subtitle)
-        
+
         csrf = self.bili_jct
         # oid = "244626685"
         payload = f'lan={self.lang}&submit=true&csrf={csrf}&sign=false&bvid={self.bvid}&type=1&oid={oid}&{parse.urlencode({"data":subtitle})}'
@@ -331,7 +368,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
             # "origin": "https://account.bilibili.com",
             "Content-Type": "application/x-www-form-urlencoded",
         }
-        headers.update(cookie)
+        headers.update({"Cookie": self.cookie.get()})
 
         url = "https://api.bilibili.com/x/v2/dm/subtitle/draft/save"
         response = requests.request("POST", url, headers=headers, data=payload)
