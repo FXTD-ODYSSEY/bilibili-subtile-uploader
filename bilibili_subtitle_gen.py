@@ -41,6 +41,39 @@ LANG_LIST = [
     "zh-CN",
 ]
 
+class BccParserMixin(object):
+    @staticmethod
+    def time_to_seconds(t):
+        return t.hours * 3600 + t.minutes * 60 + t.seconds + t.milliseconds / 1000
+
+    @classmethod
+    def srt2bcc(cls, srt_path):
+        """srt2bcc 将 srt 转换为 bcc B站字幕格式
+
+        :param srt_path: srt 路径
+        :type srt_path: srt
+        :return: bcc json 数据
+        :rtype: srt
+        """
+        subs = pysrt.open(srt_path)
+        bcc = {
+            "font_size": 0.4,
+            "font_color": "#FFFFFF",
+            "background_alpha": 0.5,
+            "background_color": "#9C27B0",
+            "Stroke": "none",
+            "body": [
+                {
+                    "from": cls.time_to_seconds(sub.start),
+                    "to": cls.time_to_seconds(sub.end),
+                    "location": 2,
+                    "content": sub.text,
+                }
+                for sub in subs
+            ],
+        }
+        return bcc if subs else {}
+
 
 class ConfigDumperMixin(object):
     """ConfigDumperMixin
@@ -123,7 +156,7 @@ def TKLabelFrame(*args, **kwargs):
     Frame.pack(**pack)
 
 
-class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
+class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin,BccParserMixin):
     @ConfigDumperMixin.load_deco
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
@@ -176,18 +209,19 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
             lang_combo.bind("<<ComboboxSelected>>", self.dump_config)
             Lang_Frame.grid_columnconfigure(1, weight=1)
 
+        with TKFrame(**pack_config) as BV_Frame:
+            tk.Label(BV_Frame, text="BV 号").grid(row=0, column=0, sticky="nsew")
+            entry = tk.Entry(BV_Frame, textvariable=self.bv)
+            entry.grid(row=0, column=1, sticky="nsew")
+            BV_Frame.grid_columnconfigure(1, weight=1)
+
+
         with TKLabelFrame(
             frame={"text": "字幕自动生成并上传"},
             pack={"side": "top", "fill": "x", "padx": 5, "pady": 5},
         ) as Trans_Frame:
             pack_config = {"side": "top", "fill": "x", "padx": 15, "pady": 5}
-
-            with TKFrame(Trans_Frame, **pack_config) as BV_Frame:
-                tk.Label(BV_Frame, text="BV 号").grid(row=0, column=0, sticky="nsew")
-                entry = tk.Entry(BV_Frame, textvariable=self.bv)
-                entry.grid(row=0, column=1, sticky="nsew")
-                BV_Frame.grid_columnconfigure(1, weight=1)
-
+            
             with TKFrame(Trans_Frame, **pack_config) as Proxy_Frame:
                 text = "代理地址(空值则不代理)"
                 tk.Label(Proxy_Frame, text=text).grid(row=0, column=0, sticky="nsew")
@@ -203,40 +237,8 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
             frame={"text": "批量上传现有字幕"},
             pack={"side": "top", "fill": "x", "padx": 5, "pady": 5},
         ) as Upload_Frame:
-            gen_btn = tk.Button(Upload_Frame, text="自动生成并上传字幕", command=self.run)
+            gen_btn = tk.Button(Upload_Frame, text="选择字幕文件进行上传", command=self.upload_subtile)
             gen_btn.pack(side="top", fill="x", padx=5, pady=5)
-
-    @staticmethod
-    def time_to_seconds(t):
-        return t.hours * 3600 + t.minutes * 60 + t.seconds + t.milliseconds / 1000
-
-    @classmethod
-    def parse_srt(cls, srt_path):
-        """parse_srt 将 srt 转换为 bcc B站字幕格式
-
-        :param srt_path: srt 路径
-        :type srt_path: srt
-        :return: bcc json 数据
-        :rtype: srt
-        """
-        subs = pysrt.open(srt_path)
-        bcc = {
-            "font_size": 0.4,
-            "font_color": "#FFFFFF",
-            "background_alpha": 0.5,
-            "background_color": "#9C27B0",
-            "Stroke": "none",
-            "body": [
-                {
-                    "from": cls.time_to_seconds(sub.start),
-                    "to": cls.time_to_seconds(sub.end),
-                    "location": 2,
-                    "content": sub.text,
-                }
-                for sub in subs
-            ],
-        }
-        return bcc if subs else {}
 
     def helpWin(self):
         # NOTE 删除重复的窗口
@@ -252,30 +254,42 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
     def onClosing(self):
         self.parent.destroy()
 
+    @staticmethod
+    def check_variable(func):
+        
+        def _check(self):
+            # Note 检查输入是否合法
+            bv = self.bv.get()
+            cookie = self.cookie.get()
+
+            if not bv or not cookie:
+                msg = "缺少输入参数"
+                print(msg)
+                tk.messagebox.showwarning("警告", msg)
+                return False
+
+            for line in cookie.split(";"):
+                line = line.strip()
+                if line.startswith("bili_jct="):
+                    self.bili_jct = line[len("bili_jct=") :]
+                    break
+            else:
+                msg = "缺少 bili_jct 值"
+                print(msg)
+                tk.messagebox.showwarning("警告", msg)
+                return False
+            return True
+        
+        def wrapper(self,*args, **kwargs):
+            if not _check(self):
+                return
+            return func(self,*args, **kwargs)
+            
+        return wrapper
+    
+    @check_variable.__func__
     def run(self):
-
-        # Note 检查输入是否合法
-        bv = self.bv.get()
-        lang = self.lang_index.get()
-        cookie = self.cookie.get()
-
-        if not bv or not cookie:
-            msg = "缺少输入参数"
-            print(msg)
-            tk.messagebox.showwarning("警告", msg)
-            return
-
-        for line in cookie.split(";"):
-            line = line.strip()
-            if line.startswith("bili_jct="):
-                self.bili_jct = line[len("bili_jct=") :]
-                break
-        else:
-            msg = "缺少 bili_jct 值"
-            print(msg)
-            tk.messagebox.showwarning("警告", msg)
-            return
-
+        
         autosub = os.path.join(__file__, "..", "autosub", "autosub.exe")
         if not os.path.isfile(autosub):
             msg = f"{autosub} 路径不存在\n请到 https://github.com/BingLingGroup/autosub/releases 页面下载最新版本的 autosub.exe 程序"
@@ -319,8 +333,16 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
 
             self.submit_subtitle(srt_path)
 
-        tk.messagebox.showinfo("恭喜你", f"{bv} 字幕上传成功")
+        tk.messagebox.showinfo("恭喜你", f"{self.bvid} 字幕上传成功")
+    
+    @check_variable.__func__
+    def upload_subtile(self):
+        info = self.get_video_info()
+        pages = info.get("pages")
+        for p, oid in pages.items():
+            pass
 
+    
     @property
     def bvid(self):
         bv = self.bv.get()
@@ -375,7 +397,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
     def submit_subtitle(self, srt_path):
 
         oid = os.path.splitext(os.path.basename(srt_path))[0]
-        subtitle = self.parse_srt(srt_path)
+        subtitle = self.srt2bcc(srt_path)
         if not subtitle:
             print(f"{oid}.srt 文件为空 - 跳过")
             return
