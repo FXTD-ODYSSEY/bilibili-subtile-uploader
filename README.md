@@ -2,8 +2,10 @@
 auto upload caption
 
 
-https://github.com/SigureMo/bilili
-https://github.com/BingLingGroup/autosub
+[bilili 视频下载](https://github.com/SigureMo/bilili) 
+[autosub 字幕生成](https://github.com/BingLingGroup/autosub) 
+[autosub 使用教程](https://binglinggroup.github.io/archives/autosub_057a_quick_guide.html)
+
 
 TOOD
 - [x] 通过 bilili  自动下载链接的视频
@@ -12,12 +14,12 @@ TOOD
 - [x] 将 srt 字幕转换为 bcc 字幕
 - [x] 构建界面
 - [x] 通过 subtitle 接口上传字幕
-
-运行 autosub `python autosub/__init__.py -h`
+- [ ] 批量上传现有字幕
 
 # API 链接 
 
-API 索引参考 https://github.com/SocialSisterYi/bilibili-API-collect
+API 索引参考 [bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)    
+字幕上传 API 尚未收录
 
 > https://api.bilibili.com/x/v2/dm/subtitle/draft/save
 
@@ -37,17 +39,5 @@ API 索引参考 https://github.com/SocialSisterYi/bilibili-API-collect
 | oid    | num   | 分P编号                  | 必要   |                   |
 
 
-oid 可以下面的链接获取
+oid 可以通过 http://api.bilibili.com/x/web-interface/view 获取
 
-## 查询视频分P列表  (avID/bvID转CID)
-
-> http://api.bilibili.com/x/player/pagelist
-
-*请求方式：GET*
-
-**url参数：**
-
-| 参数名 | 类型 | 内容     | 必要性       | 备注               |
-| ------ | ---- | -------- | ------------ | ------------------ |
-| aid    | num  | 稿件avID | 必要（可选） | avID与bvID任选一个 |
-| bvid   | str  | 稿件bvID | 必要（可选） | avID与bvID任选一个 |

@@ -36,8 +36,17 @@ except:
     import tkFileDialog as filedialog
     import tkMessageBox as messagebox
 
+LANG_LIST = [
+    "en-US",
+    "zh-CN",
+]
+
 
 class ConfigDumperMixin(object):
+    """ConfigDumperMixin
+    自动记录 Tkinter Variable 配置
+    """
+
     @staticmethod
     def load_deco(func):
         def wrapper(self, *args, **kwargs):
@@ -75,6 +84,10 @@ class ConfigDumperMixin(object):
 
 
 class ListVar(tk.Variable):
+    """ListVar
+    自动将 ListVar 数据映射为对应序号
+    """
+
     @property
     def list_data(self):
         return self._list_data
@@ -94,25 +107,23 @@ class ListVar(tk.Variable):
 
 @contextlib.contextmanager
 def TKFrame(*args, **kwargs):
-    Frame = tk.Frame()
+    Frame = tk.Frame(*args)
     yield Frame
     Frame.pack(**kwargs)
 
 
 @contextlib.contextmanager
-def TKFrame(*args, **kwargs):
-    Frame = tk.Frame()
+def TKLabelFrame(*args, **kwargs):
+    frame = kwargs.get("frame", {})
+    pack = kwargs.get("pack", {})
+    args = frame.pop("__args__", [])
+    args.extend(args)
+    Frame = tk.LabelFrame(*args, **frame)
     yield Frame
-    Frame.pack(**kwargs)
+    Frame.pack(**pack)
 
 
 class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
-
-    LANG_LIST = [
-        "en-US",
-        "zh-CN",
-    ]
-
     @ConfigDumperMixin.load_deco
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
@@ -135,7 +146,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
         self.cookie.trace("w", self.dump_config)
 
         self.lang_index = ListVar()
-        self.lang_index.list_data = self.LANG_LIST
+        self.lang_index.list_data = LANG_LIST
         self.lang_index.set(0)
 
         self.bv = tk.StringVar()
@@ -144,45 +155,56 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
         self.proxy = tk.StringVar()
         self.proxy.trace("w", self.dump_config)
 
-        with TKFrame(side="top", fill="x", padx=5, pady=5) as Main_Frame:
-            with TKFrame(side="top", fill="x", padx=15, pady=5) as Cookie_Frame:
-                tk.Label(Cookie_Frame, text="登陆 Cookie").grid(
-                    row=0, column=0, sticky="nsew"
-                )
-                entry = tk.Entry(Cookie_Frame, textvariable=self.cookie)
-                entry.grid(row=0, column=1, sticky="nsew")
-                Cookie_Frame.grid_columnconfigure(1, weight=1)
+        pack_config = {"side": "top", "fill": "x", "padx": 5, "pady": 5}
 
-            with TKFrame(side="top", fill="x", padx=15) as Lang_Frame:
-                label = tk.Label(Lang_Frame, text="选择语言")
-                label.grid(row=0, column=0, sticky="nsew")
+        with TKFrame(**pack_config) as Cookie_Frame:
+            text = "登陆 Cookie"
+            tk.Label(Cookie_Frame, text=text).grid(row=0, column=0, sticky="nsew")
+            entry = tk.Entry(Cookie_Frame, textvariable=self.cookie)
+            entry.grid(row=0, column=1, sticky="nsew")
+            Cookie_Frame.grid_columnconfigure(1, weight=1)
 
-                lang_combo = ttk.Combobox(
-                    Lang_Frame, textvariable=self.lang_index, state="readonly"
-                )
-                lang_combo.grid(row=0, column=1, sticky="nsew")
-                lang_combo["values"] = self.LANG_LIST
-                lang_combo.bind("<<ComboboxSelected>>", self.dump_config)
-                Lang_Frame.grid_columnconfigure(1, weight=1)
+        with TKFrame(**pack_config) as Lang_Frame:
+            label = tk.Label(Lang_Frame, text="选择语言")
+            label.grid(row=0, column=0, sticky="nsew")
 
-            with TKFrame(side="top", fill="x", padx=15, pady=5) as BV_Frame:
+            lang_combo = ttk.Combobox(
+                Lang_Frame, textvariable=self.lang_index, state="readonly"
+            )
+            lang_combo.grid(row=0, column=1, sticky="nsew")
+            lang_combo["values"] = LANG_LIST
+            lang_combo.bind("<<ComboboxSelected>>", self.dump_config)
+            Lang_Frame.grid_columnconfigure(1, weight=1)
+
+        with TKLabelFrame(
+            frame={"text": "字幕自动生成并上传"},
+            pack={"side": "top", "fill": "x", "padx": 5, "pady": 5},
+        ) as Trans_Frame:
+            pack_config = {"side": "top", "fill": "x", "padx": 15, "pady": 5}
+
+            with TKFrame(Trans_Frame, **pack_config) as BV_Frame:
                 tk.Label(BV_Frame, text="BV 号").grid(row=0, column=0, sticky="nsew")
-
                 entry = tk.Entry(BV_Frame, textvariable=self.bv)
                 entry.grid(row=0, column=1, sticky="nsew")
                 BV_Frame.grid_columnconfigure(1, weight=1)
 
-            with TKFrame(side="top", fill="x", padx=15, pady=5) as BV_Frame:
-                tk.Label(BV_Frame, text="代理地址(空值则不代理)").grid(
-                    row=0, column=0, sticky="nsew"
-                )
-
-                entry = tk.Entry(BV_Frame, textvariable=self.proxy)
+            with TKFrame(Trans_Frame, **pack_config) as Proxy_Frame:
+                text = "代理地址(空值则不代理)"
+                tk.Label(Proxy_Frame, text=text).grid(row=0, column=0, sticky="nsew")
+                entry = tk.Entry(Proxy_Frame, textvariable=self.proxy)
                 entry.grid(row=0, column=1, sticky="nsew")
-                BV_Frame.grid_columnconfigure(1, weight=1)
+                Proxy_Frame.grid_columnconfigure(1, weight=1)
 
-            gen_btn = tk.Button(Main_Frame, text="自动生成并上传字幕", command=self.run)
-            gen_btn.pack(side="top", fill="x", padx=5)
+            gen_btn = tk.Button(Trans_Frame, text="自动生成并上传字幕", command=self.run)
+            gen_btn.pack(side="top", fill="x", padx=5, pady=5)
+
+        # TODO 字幕批量上传
+        with TKLabelFrame(
+            frame={"text": "批量上传现有字幕"},
+            pack={"side": "top", "fill": "x", "padx": 5, "pady": 5},
+        ) as Upload_Frame:
+            gen_btn = tk.Button(Upload_Frame, text="自动生成并上传字幕", command=self.run)
+            gen_btn.pack(side="top", fill="x", padx=5, pady=5)
 
     @staticmethod
     def time_to_seconds(t):
