@@ -8,7 +8,7 @@ https://github.com/BingLingGroup/autosub
 TOOD
 - [x] 通过 bilili  自动下载链接的视频
 - [x] ~~使用 autosub 获取字幕~~
-- [ ] 使用国人维护的 autosub 进行下载
+- [x] 使用国人维护的 autosub 进行下载
 - [x] 将 srt 字幕转换为 bcc 字幕
 - [x] 构建界面
 - [x] 通过 subtitle 接口上传字幕

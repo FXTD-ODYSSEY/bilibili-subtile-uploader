@@ -178,7 +178,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
         :rtype: srt
         """
         subs = pysrt.open(srt_path)
-        bcc = {
+        return {
             "font_size": 0.4,
             "font_color": "#FFFFFF",
             "background_alpha": 0.5,
@@ -194,7 +194,6 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
                 for sub in subs
             ],
         } if subs else {}
-        return json.dumps(bcc)
 
     def helpWin(self):
         # NOTE 删除重复的窗口
@@ -228,6 +227,11 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
             tk.messagebox.showwarning("警告","缺少 bili_jct 值")
             return
         
+        autosub = os.path.join(__file__,'..','autosub','autosub.exe')
+        if not os.path.isfile(autosub):
+            tk.messagebox.showwarning("警告",f"{autosub} 路径不存在\n请到 https://github.com/BingLingGroup/autosub/releases 页面下载最新版本的 autosub.exe 程序")
+            return
+            
         # NOTE 查询下载的视频对应的 oid
         info = self.get_video_info()
         
@@ -246,10 +250,15 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
             if not os.path.isfile(src):
                 continue
             os.rename(src,dst)
+            dst = os.path.abspath(dst)
+            
             # NOTE 调用 autosub 进行视频字幕生成
-            subprocess.call([sys.executable,'autosub/__init__.py',dst])
-            srt_path = os.path.join(video,f"{oid}.srt")
-            self.submit_subtitle(srt_path)
+            command = " ".join([autosub,'-i',f'"{dst}"','-S',self.lang])
+            print(command)
+            subprocess.call(command)
+            srt_path = os.path.join(video,f"{oid}.{self.lang.lower()}.srt")
+            print(srt_path)
+            # self.submit_subtitle(srt_path,cookie)
         
         print("downlaod complete")
 
@@ -265,6 +274,10 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
             if bv.startswith("http")
             else bv
         )
+        
+    @property
+    def lang(self):
+        return self.lang_index.list_data[self.lang_index.get()]
 
     def get_video_info(self,bvid=""):
         bvid = bvid if bvid else self.bvid
@@ -300,25 +313,25 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
             ]
         )
 
-    def submit_subtitle(self,srt_path):
+    def submit_subtitle(self,srt_path,cookie):
 
         oid = os.path.splitext(os.path.basename(srt_path))[0]
         subtitle = self.parse_srt(srt_path)
         if not subtitle:
             print(f"{oid}.srt 文件为空 - 跳过")
             return
+        subtitle = json.dumps(subtitle)
         
         csrf = self.bili_jct
         # oid = "244626685"
-        lang = self.lang_index.list_data[self.lang_index.get()]
-        payload = f'lan={lang}&submit=true&csrf={csrf}&sign=false&bvid={self.bvid}&type=1&oid={oid}&{parse.urlencode({"data":subtitle})}'
+        payload = f'lan={self.lang}&submit=true&csrf={csrf}&sign=false&bvid={self.bvid}&type=1&oid={oid}&{parse.urlencode({"data":subtitle})}'
 
         headers = {
             # "referer": "https://account.bilibili.com/subtitle/edit/",
             # "origin": "https://account.bilibili.com",
             "Content-Type": "application/x-www-form-urlencoded",
         }
-        headers.update(Cookie)
+        headers.update(cookie)
 
         url = "https://api.bilibili.com/x/v2/dm/subtitle/draft/save"
         response = requests.request("POST", url, headers=headers, data=payload)
