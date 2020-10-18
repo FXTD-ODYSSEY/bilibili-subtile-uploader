@@ -177,6 +177,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
         :return: bcc json 数据
         :rtype: srt
         """
+        subs = pysrt.open(srt_path)
         bcc = {
             "font_size": 0.4,
             "font_color": "#FFFFFF",
@@ -190,9 +191,9 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
                     "location": 2,
                     "content": sub.text,
                 }
-                for sub in pysrt.open(srt_path)
+                for sub in subs
             ],
-        }
+        } if subs else {}
         return json.dumps(bcc)
 
     def helpWin(self):
@@ -210,12 +211,45 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
         self.parent.destroy()
 
     def run(self):
-        # TODO 检查输入是否合法
-        self.download_video()
-        # TODO 查询下载的视频对应的 oid
-        # TODO 调用 autosub 进行视频字幕生成
-        # subprocess.call([sys.executable,'autosub/__init__.py',srt])
-        # TODO 调用字幕 API 上传字幕文件
+        # Note 检查输入是否合法
+        bv = self.bv.get()
+        lang = self.lang_index.get()
+        cookie = self.Cookie.get()
+        if not bv or not cookie:
+            tk.messagebox.showwarning("警告","缺少输入参数")
+            return
+        
+        for line in cookie.split(";"):
+            line = line.strip()
+            if line.startswith("bili_jct="):
+                self.bili_jct = line[len("bili_jct=") :]
+                break
+        else:
+            tk.messagebox.showwarning("警告","缺少 bili_jct 值")
+            return
+        
+        # NOTE 查询下载的视频对应的 oid
+        info = self.get_video_info()
+        
+        # # NOTE 下载视频
+        # self.download_video()
+
+        # NOTE 修改视频名称为 oid 
+        title = info.get("title")
+        pages = info.get("pages")
+        
+        video = os.path.join(__file__, "..","video",f"{title} - bilibili","Videos")
+
+        for p,oid in pages.items():
+            src = os.path.join(video,f"{p}.mp4")
+            dst = os.path.join(video,f"{oid}.mp4")
+            if not os.path.isfile(src):
+                continue
+            os.rename(src,dst)
+            # NOTE 调用 autosub 进行视频字幕生成
+            subprocess.call([sys.executable,'autosub/__init__.py',dst])
+            srt_path = os.path.join(video,f"{oid}.srt")
+            self.submit_subtitle(srt_path)
         
         print("downlaod complete")
 
@@ -231,6 +265,19 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
             if bv.startswith("http")
             else bv
         )
+
+    def get_video_info(self,bvid=""):
+        bvid = bvid if bvid else self.bvid
+        url = f"http://api.bilibili.com/x/web-interface/view?bvid={bvid}"
+
+        response = requests.request("GET", url)
+
+        data = json.loads(response.text.encode('utf8')).get("data",{})
+        
+        return {
+            "title": data.get("title"),
+            "pages": {p.get("part"):p.get("cid") for p in data.get("pages",{})},
+        }
 
     def download_video(self):
 
@@ -253,29 +300,16 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
             ]
         )
 
-    def submit_subtitle(self):
+    def submit_subtitle(self,srt_path):
 
-        DIR = os.path.dirname(os.path.abspath(__file__))
-        with open(os.path.join(DIR, "config.json"), "r") as f:
-            Cookie = json.load(f)
-
-        csrf = ""
-        cookie = self.Cookie.get()
-        for line in cookie.split(";"):
-            line = line.strip()
-            if line.startswith("bili_jct="):
-                bili_jct = line[len("bili_jct=") :]
-                break
-        else:
-            print("缺少 bili_jct 值")
+        oid = os.path.splitext(os.path.basename(srt_path))[0]
+        subtitle = self.parse_srt(srt_path)
+        if not subtitle:
+            print(f"{oid}.srt 文件为空 - 跳过")
             return
-
-        url = "https://api.bilibili.com/x/v2/dm/subtitle/draft/save"
-
-        subtitle = """{"font_size":0.4,"font_color":"#FFFFFF","background_alpha":0.5,"background_color":"#9C27B0","Stroke":"none","body":[{"from":4.19,"to":5.93,"location":2,"content":"Hire one."},{"from":6.13,"to":12.43,"location":2,"content":"Annd welcome to the set up section where I'll walk you through the steps in order to get started with"},{"from":12.49,"to":15.57,"location":2,"content":"coding for engine for at this point."},{"from":15.58,"to":19.46,"location":2,"content":"I assume you already have the engine installed and ready to go."},{"from":19.66,"to":26.2,"location":2,"content":"So I'll focus on setting up Visual Studio and highly recommended visual assist plugin which will significantly"},{"from":26.2,"to":30.71,"location":2,"content":"improve your quality of life when coding with C++ throughout the course."},{"from":30.73,"to":37.42,"location":2,"content":"I'll be using visualises for Intellisense and certain navigation Akis if you don't get Ulysses yet you"},{"from":37.42,"to":40.91,"location":2,"content":"can try the trial version for free in case you're wondering."},{"from":40.98,"to":46.79,"location":2,"content":"I will be using Unreal engine for 1:17 for of this course using a later version of the engine is OK"},{"from":46.84,"to":53.68,"location":2,"content":"but keep in mind that the look of the windows may change or that small API changes in C++ moniker to"},{"from":53.68,"to":54.67,"location":2,"content":"be absolutely safe."},{"from":54.67,"to":56.17,"location":2,"content":"Please use Fortran 17."},{"from":56.17,"to":61.36,"location":2,"content":"And please do notify me of any changes or issues you run into by posting in the Q and A board."},{"from":61.39,"to":66.76,"location":2,"content":"I will do my best to keep the videos up to date ones later additions of the engine are released and"},{"from":66.93,"to":70.86,"location":2,"content":"your help in pointing out inconsistencies will be greatly appreciated."}]}"""
-
-        csrf = bili_jct
-        oid = "244626685"
+        
+        csrf = self.bili_jct
+        # oid = "244626685"
         lang = self.lang_index.list_data[self.lang_index.get()]
         payload = f'lan={lang}&submit=true&csrf={csrf}&sign=false&bvid={self.bvid}&type=1&oid={oid}&{parse.urlencode({"data":subtitle})}'
 
@@ -286,6 +320,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin):
         }
         headers.update(Cookie)
 
+        url = "https://api.bilibili.com/x/v2/dm/subtitle/draft/save"
         response = requests.request("POST", url, headers=headers, data=payload)
 
         print(response.text.encode("utf8"))

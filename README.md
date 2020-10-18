@@ -3,13 +3,14 @@ auto upload caption
 
 
 https://github.com/SigureMo/bilili
-https://github.com/agermanidis/autosub
+https://github.com/BingLingGroup/autosub
 
 TOOD
-- [ ] 自动下载链接的视频
-- [ ] 使用 autosub 获取字幕
-- [ ] 将 srt 字幕转换为 bcc 字幕
-- [ ] 构建界面
+- [x] 通过 bilili  自动下载链接的视频
+- [x] ~~使用 autosub 获取字幕~~
+- [ ] 使用国人维护的 autosub 进行下载
+- [x] 将 srt 字幕转换为 bcc 字幕
+- [x] 构建界面
 - [x] 通过 subtitle 接口上传字幕
 
 运行 autosub `python autosub/__init__.py -h`
