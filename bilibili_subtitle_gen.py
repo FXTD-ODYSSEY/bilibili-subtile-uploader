@@ -38,8 +38,9 @@ except:
 
 LANG_LIST = [
     "en-US",
-    "zh-CN",
+    # "zh-CN",
 ]
+
 
 class BccParserMixin(object):
     @staticmethod
@@ -156,7 +157,7 @@ def TKLabelFrame(*args, **kwargs):
     Frame.pack(**pack)
 
 
-class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin,BccParserMixin):
+class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
     @ConfigDumperMixin.load_deco
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
@@ -215,13 +216,12 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin,BccParserMixin):
             entry.grid(row=0, column=1, sticky="nsew")
             BV_Frame.grid_columnconfigure(1, weight=1)
 
-
         with TKLabelFrame(
             frame={"text": "字幕自动生成并上传"},
             pack={"side": "top", "fill": "x", "padx": 5, "pady": 5},
         ) as Trans_Frame:
             pack_config = {"side": "top", "fill": "x", "padx": 15, "pady": 5}
-            
+
             with TKFrame(Trans_Frame, **pack_config) as Proxy_Frame:
                 text = "代理地址(空值则不代理)"
                 tk.Label(Proxy_Frame, text=text).grid(row=0, column=0, sticky="nsew")
@@ -237,7 +237,9 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin,BccParserMixin):
             frame={"text": "批量上传现有字幕"},
             pack={"side": "top", "fill": "x", "padx": 5, "pady": 5},
         ) as Upload_Frame:
-            gen_btn = tk.Button(Upload_Frame, text="选择字幕文件进行上传", command=self.upload_subtile)
+            gen_btn = tk.Button(
+                Upload_Frame, text="选择字幕文件进行上传", command=self.upload_subtile
+            )
             gen_btn.pack(side="top", fill="x", padx=5, pady=5)
 
     def helpWin(self):
@@ -256,7 +258,6 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin,BccParserMixin):
 
     @staticmethod
     def check_variable(func):
-        
         def _check(self):
             # Note 检查输入是否合法
             bv = self.bv.get()
@@ -279,14 +280,14 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin,BccParserMixin):
                 tk.messagebox.showwarning("警告", msg)
                 return False
             return True
-        
-        def wrapper(self,*args, **kwargs):
+
+        def wrapper(self, *args, **kwargs):
             if not _check(self):
                 return
-            return func(self,*args, **kwargs)
-            
+            return func(self, *args, **kwargs)
+
         return wrapper
-    
+
     @check_variable.__func__
     def run(self):
         
@@ -297,64 +298,73 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin,BccParserMixin):
             tk.messagebox.showwarning("警告", msg)
             return
 
-        # NOTE 查询下载的视频对应的 oid
-        info = self.get_video_info()
+        for bvid in self.bvid_list:
+            self.bvid = bvid 
 
-        # NOTE 下载视频
-        self.download_video()
+            # NOTE 查询下载的视频对应的 oid
+            info = self.get_video_info()
 
-        # NOTE 修改视频名称为 oid
-        title = info.get("title")
-        pages = info.get("pages")
+            # NOTE 下载视频
+            self.download_video()
 
-        video = os.path.join(__file__, "..", "video", f"{title} - bilibili", "Videos")
+            # NOTE 修改视频名称为 oid
+            title = info.get("title").replace("&","&amp;")
+            pages = info.get("pages")
 
-        proxy = self.proxy.get()
-        for p, oid in pages.items():
-            src = os.path.join(video, f"{p}.mp4")
-            if not os.path.isfile(src):
-                continue
+            video = os.path.join(__file__, "..", "video", f"{title} - bilibili", "Videos")
 
-            # NOTE 调用 autosub 进行视频字幕生成
-            args = [autosub, "-i", f'"{src}"', "-S", self.lang]
-            args.extend(["-hsp", proxy]) if proxy.startswith("http") else None
+            proxy = self.proxy.get()
+            for p, oid in pages.items():
+                src = os.path.join(video, f"{p}.mp4")
+                if not os.path.isfile(src):
+                    continue
 
-            command = " ".join(args)
+                # NOTE 调用 autosub 进行视频字幕生成
+                args = [autosub, "-i", f'"{src}"', "-S", self.lang]
+                args.extend(["-hsp", proxy]) if proxy.startswith("http") else None
 
-            src = os.path.join(video, f"{p}.{self.lang.lower()}.srt")
-            os.remove(src) if os.path.isfile(src) else None
+                command = " ".join(args)
 
-            subprocess.call(command)
+                src = os.path.join(video, f"{p}.{self.lang.lower()}.srt")
+                os.remove(src) if os.path.isfile(src) else None
 
-            srt_path = os.path.join(video, f"{oid}.srt")
-            os.remove(srt_path) if os.path.isfile(srt_path) else None
+                subprocess.call(command)
 
-            os.rename(src, srt_path)
+                srt_path = os.path.join(video, f"{oid}.srt")
+                os.remove(srt_path) if os.path.isfile(srt_path) else None
 
-            self.submit_subtitle(srt_path)
+                os.rename(src, srt_path)
+
+                self.submit_subtitle(srt_path)
 
         tk.messagebox.showinfo("恭喜你", f"{self.bvid} 字幕上传成功")
-    
+
     @check_variable.__func__
     def upload_subtile(self):
+        directory = filedialog.askdirectory()
+        if not directory:
+            return
+
         info = self.get_video_info()
         pages = info.get("pages")
-        for p, oid in pages.items():
-            pass
+        for root, _, files in os.walk(directory):
+            for f in files:
+                name = f[: -len(".srt")]
+                if not f.endswith(".srt") or name not in pages:
+                    continue
+                oid = pages.get(name)
+                srt_path = os.path.join(root, f)
+                os.remove(srt_path) if os.path.isfile(srt_path) else None
+                self.submit_subtitle(srt_path)
 
-    
     @property
-    def bvid(self):
+    def bvid_list(self):
         bv = self.bv.get()
-        return (
-            [
-                v
-                for v in re.split(r"/|\\|\?", bv)
-                if v.lower().startswith("bv") or v.lower().startswith("av")
-            ][-1]
-            if bv.startswith("http")
-            else bv
-        )
+        return [
+            v
+            for v in re.split(r"/|\\|\?| ", bv)
+            if v.lower().startswith("bv") or v.lower().startswith("av")
+        ]
 
     @property
     def lang(self):
@@ -391,6 +401,8 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin,BccParserMixin):
                 "no",
                 "-q",
                 "16",
+                "--audio-quality",
+                "30280",
             ]
         )
 

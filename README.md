@@ -15,6 +15,7 @@ TOOD
 - [x] 构建界面
 - [x] 通过 subtitle 接口上传字幕
 - [ ] 批量上传现有字幕
+- [ ] 多线程调用 autosub 提高字幕生成效率
 
 # API 链接 
 
@@ -41,3 +42,8 @@ API 索引参考 [bilibili-API-collect](https://github.com/SocialSisterYi/bilibi
 
 oid 可以通过 http://api.bilibili.com/x/web-interface/view 获取
 
+---
+
+> https://api.bilibili.com/x/space/arc/search?mid=12895307&ps=30&tid=0&pn=1&keyword=&order=pubdate&jsonp=jsonp
+
+获取空间的视频信息
