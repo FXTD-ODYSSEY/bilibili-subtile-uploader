@@ -15,7 +15,9 @@ TOOD
 - [x] 构建界面
 - [x] 通过 subtitle 接口上传字幕
 - [ ] 批量上传现有字幕
-- [ ] 多线程调用 autosub 提高字幕生成效率
+- [ ] ~~多线程调用 autosub 提高字幕生成效率~~
+- [x] youtube Private 视频字幕下载测试
+- [x] youtube vtt 字幕转 bcc (~~保留逐字出现效果~~ 效果不好)
 
 # API 链接 
 

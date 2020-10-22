@@ -24,6 +24,7 @@ import subprocess
 from urllib import parse
 
 import pysrt
+import pyvtt
 
 # NOTE Python 3 & 2 兼容
 try:
@@ -38,16 +39,12 @@ except:
 
 LANG_LIST = [
     "en-US",
-    # "zh-CN",
+    "zh-CN",
 ]
 
 
 class BccParserMixin(object):
     @staticmethod
-    def time_to_seconds(t):
-        return t.hours * 3600 + t.minutes * 60 + t.seconds + t.milliseconds / 1000
-
-    @classmethod
     def srt2bcc(cls, srt_path):
         """srt2bcc 将 srt 转换为 bcc B站字幕格式
 
@@ -65,10 +62,32 @@ class BccParserMixin(object):
             "Stroke": "none",
             "body": [
                 {
-                    "from": cls.time_to_seconds(sub.start),
-                    "to": cls.time_to_seconds(sub.end),
+                    "from": sub.start.ordinal / 1000,
+                    "to": sub.end.ordinal / 1000,
                     "location": 2,
                     "content": sub.text,
+                }
+                for sub in subs
+            ],
+        }
+        return bcc if subs else {}
+
+    @staticmethod
+    def vtt2bcc(cls, path):
+        
+        subs = pyvtt.open(path)
+        bcc = {
+            "font_size": 0.4,
+            "font_color": "#FFFFFF",
+            "background_alpha": 0.5,
+            "background_color": "#9C27B0",
+            "Stroke": "none",
+            "body": [
+                {
+                    "from": sub.start.ordinal / 1000,
+                    "to": sub.end.ordinal / 1000,
+                    "location": 2,
+                    "content": sub.text_without_tags,
                 }
                 for sub in subs
             ],
@@ -176,8 +195,11 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         menubar.add_cascade(label="帮助", menu=filemenu)
         parent.config(menu=menubar)
 
-        self.cookie = tk.StringVar()
-        self.cookie.trace("w", self.dump_config)
+        self.bilibili_cookie = tk.StringVar()
+        self.bilibili_cookie.trace("w", self.dump_config)
+        
+        self.youtube_cookie = tk.StringVar()
+        self.youtube_cookie.trace("w", self.dump_config)
 
         self.lang_index = ListVar()
         self.lang_index.list_data = LANG_LIST
@@ -192,44 +214,51 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         pack_config = {"side": "top", "fill": "x", "padx": 5, "pady": 5}
 
         with TKFrame(**pack_config) as Cookie_Frame:
-            text = "登陆 Cookie"
+            text = "Bilibili 登陆 Cookie"
             tk.Label(Cookie_Frame, text=text).grid(row=0, column=0, sticky="nsew")
-            entry = tk.Entry(Cookie_Frame, textvariable=self.cookie)
+            entry = tk.Entry(Cookie_Frame, textvariable=self.bilibili_cookie)
             entry.grid(row=0, column=1, sticky="nsew")
             Cookie_Frame.grid_columnconfigure(1, weight=1)
-
-        with TKFrame(**pack_config) as Lang_Frame:
-            label = tk.Label(Lang_Frame, text="选择语言")
-            label.grid(row=0, column=0, sticky="nsew")
-
-            lang_combo = ttk.Combobox(
-                Lang_Frame, textvariable=self.lang_index, state="readonly"
-            )
-            lang_combo.grid(row=0, column=1, sticky="nsew")
-            lang_combo["values"] = LANG_LIST
-            lang_combo.bind("<<ComboboxSelected>>", self.dump_config)
-            Lang_Frame.grid_columnconfigure(1, weight=1)
 
         with TKFrame(**pack_config) as BV_Frame:
             tk.Label(BV_Frame, text="BV 号").grid(row=0, column=0, sticky="nsew")
             entry = tk.Entry(BV_Frame, textvariable=self.bv)
             entry.grid(row=0, column=1, sticky="nsew")
             BV_Frame.grid_columnconfigure(1, weight=1)
+        
+        with TKFrame(**pack_config) as Proxy_Frame:
+            text = "代理地址(空值则不代理)"
+            tk.Label(Proxy_Frame, text=text).grid(row=0, column=0, sticky="nsew")
+            entry = tk.Entry(Proxy_Frame, textvariable=self.proxy)
+            entry.grid(row=0, column=1, sticky="nsew")
+            Proxy_Frame.grid_columnconfigure(1, weight=1)
+            
 
         with TKLabelFrame(
-            frame={"text": "字幕自动生成并上传"},
+            frame={"text": "AutoSub 生成机翻字幕"},
             pack={"side": "top", "fill": "x", "padx": 5, "pady": 5},
         ) as Trans_Frame:
             pack_config = {"side": "top", "fill": "x", "padx": 15, "pady": 5}
 
-            with TKFrame(Trans_Frame, **pack_config) as Proxy_Frame:
-                text = "代理地址(空值则不代理)"
-                tk.Label(Proxy_Frame, text=text).grid(row=0, column=0, sticky="nsew")
-                entry = tk.Entry(Proxy_Frame, textvariable=self.proxy)
-                entry.grid(row=0, column=1, sticky="nsew")
-                Proxy_Frame.grid_columnconfigure(1, weight=1)
+            gen_btn = tk.Button(Trans_Frame, text="自动生成并上传字幕", command=self.autoSub_run)
+            gen_btn.pack(side="top", fill="x", padx=5, pady=5)
+            
 
-            gen_btn = tk.Button(Trans_Frame, text="自动生成并上传字幕", command=self.run)
+        with TKLabelFrame(
+            frame={"text": "Youtube 上传视频获取机翻字幕"},
+            pack={"side": "top", "fill": "x", "padx": 5, "pady": 5},
+        ) as Youtube_Frame:
+            
+            # TODO 双速字幕上传
+            with TKFrame(Youtube_Frame,**pack_config) as Cookie_Frame:
+                text = "Youtube 登陆 Cookie"
+                tk.Label(Cookie_Frame, text=text).grid(row=0, column=0, sticky="nsew")
+                entry = tk.Entry(Cookie_Frame, textvariable=self.youtube_cookie)
+                entry.grid(row=0, column=1, sticky="nsew")
+                Cookie_Frame.grid_columnconfigure(1, weight=1)
+                
+            pack_config = {"side": "top", "fill": "x", "padx": 15, "pady": 5}
+            gen_btn = tk.Button(Youtube_Frame, text="自动生成并上传字幕", command=self.autoSub_run)
             gen_btn.pack(side="top", fill="x", padx=5, pady=5)
 
         # TODO 字幕批量上传
@@ -237,6 +266,19 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             frame={"text": "批量上传现有字幕"},
             pack={"side": "top", "fill": "x", "padx": 5, "pady": 5},
         ) as Upload_Frame:
+            
+            with TKFrame(**pack_config) as Lang_Frame:
+                label = tk.Label(Lang_Frame, text="选择语言")
+                label.grid(row=0, column=0, sticky="nsew")
+
+                lang_combo = ttk.Combobox(
+                    Lang_Frame, textvariable=self.lang_index, state="readonly"
+                )
+                lang_combo.grid(row=0, column=1, sticky="nsew")
+                lang_combo["values"] = LANG_LIST
+                lang_combo.bind("<<ComboboxSelected>>", self.dump_config)
+                Lang_Frame.grid_columnconfigure(1, weight=1)
+                
             gen_btn = tk.Button(
                 Upload_Frame, text="选择字幕文件进行上传", command=self.upload_subtile
             )
@@ -261,7 +303,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         def _check(self):
             # Note 检查输入是否合法
             bv = self.bv.get()
-            cookie = self.cookie.get()
+            cookie = self.bilibili_cookie.get()
 
             if not bv or not cookie:
                 msg = "缺少输入参数"
@@ -289,7 +331,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         return wrapper
 
     @check_variable.__func__
-    def run(self):
+    def autoSub_run(self):
         
         autosub = os.path.join(__file__, "..", "autosub", "autosub.exe")
         if not os.path.isfile(autosub):
@@ -345,6 +387,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         if not directory:
             return
 
+        # TODO
         info = self.get_video_info()
         pages = info.get("pages")
         for root, _, files in os.walk(directory):
@@ -355,7 +398,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
                 oid = pages.get(name)
                 srt_path = os.path.join(root, f)
                 os.remove(srt_path) if os.path.isfile(srt_path) else None
-                self.submit_subtitle(srt_path)
+                self.submit_subtitle(srt_path,self.lang)
 
     @property
     def bvid_list(self):
@@ -406,7 +449,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             ]
         )
 
-    def submit_subtitle(self, srt_path):
+    def submit_subtitle(self, srt_path,lang="en-US"):
 
         oid = os.path.splitext(os.path.basename(srt_path))[0]
         subtitle = self.srt2bcc(srt_path)
@@ -417,14 +460,14 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
 
         csrf = self.bili_jct
         # oid = "244626685"
-        payload = f'lan={self.lang}&submit=true&csrf={csrf}&sign=false&bvid={self.bvid}&type=1&oid={oid}&{parse.urlencode({"data":subtitle})}'
+        payload = f'lan={lang}&submit=true&csrf={csrf}&sign=false&bvid={self.bvid}&type=1&oid={oid}&{parse.urlencode({"data":subtitle})}'
 
         headers = {
             # "referer": "https://account.bilibili.com/subtitle/edit/",
             # "origin": "https://account.bilibili.com",
             "Content-Type": "application/x-www-form-urlencoded",
         }
-        headers.update({"Cookie": self.cookie.get()})
+        headers.update({"Cookie": self.bilibili_cookie.get()})
 
         url = "https://api.bilibili.com/x/v2/dm/subtitle/draft/save"
         response = requests.request("POST", url, headers=headers, data=payload)
