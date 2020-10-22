@@ -42,7 +42,28 @@ LANG_LIST = [
     "zh-CN",
 ]
 
-
+VIDEO_QUALITY_LIST = [
+    "360P(推荐)",
+    "480P",
+    "720P",
+    "720P60",
+    "1080P",
+    "1080P+",
+    "1080P60",
+    "4K",
+]
+VIDEO_QUALITY_DICT = {
+    "360P(推荐)": 16,
+    "480P": 32,
+    "720P": 64,
+    "720P60": 74,
+    "1080P": 80,
+    "1080P+": 112,
+    "1080P60": 116,
+    "4K": 120,
+}
+#   -q {120,116,112,80,74,64,32,16}, --quality {120,116,112,80,74,64,32,16}
+#                         视频清晰度 120:4K, 116:1080P60, 112:1080P+, 80:1080P, 74:720P60, 64:720P, 32:480P, 16:360P
 class BccParserMixin(object):
     @staticmethod
     def srt2bcc(cls, srt_path):
@@ -74,7 +95,7 @@ class BccParserMixin(object):
 
     @staticmethod
     def vtt2bcc(cls, path):
-        
+
         subs = pyvtt.open(path)
         bcc = {
             "font_size": 0.4,
@@ -189,7 +210,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         # NOTE 生成菜单
         menubar = tk.Menu(self)
         filemenu = tk.Menu(menubar, tearoff=0)
-        filemenu.add_command(label="使用说明", command=self.helpWin)
+        filemenu.add_command(label="使用说明", command=self.show_help_win)
         filemenu.add_separator()
         filemenu.add_command(label="退出", command=self.onClosing)
         menubar.add_cascade(label="帮助", menu=filemenu)
@@ -197,13 +218,18 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
 
         self.bilibili_cookie = tk.StringVar()
         self.bilibili_cookie.trace("w", self.dump_config)
-        
+
         self.youtube_cookie = tk.StringVar()
         self.youtube_cookie.trace("w", self.dump_config)
+        self.youtube_cn = tk.IntVar()
 
         self.lang_index = ListVar()
         self.lang_index.list_data = LANG_LIST
         self.lang_index.set(0)
+
+        self.video_quality_index = ListVar()
+        self.video_quality_index.list_data = VIDEO_QUALITY_LIST
+        self.video_quality_index.set(0)
 
         self.bv = tk.StringVar()
         self.bv.trace("w", self.dump_config)
@@ -225,14 +251,28 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             entry = tk.Entry(BV_Frame, textvariable=self.bv)
             entry.grid(row=0, column=1, sticky="nsew")
             BV_Frame.grid_columnconfigure(1, weight=1)
-        
+
+        # NOTE 视频质量下载
+        with TKFrame(**pack_config) as Quality_Frame:
+            label = tk.Label(Quality_Frame, text="视频质量")
+            label.grid(row=0, column=0, sticky="nsew")
+
+            lang_combo = ttk.Combobox(
+                Quality_Frame,
+                textvariable=self.video_quality_index,
+                values=self.video_quality_index.list_data,
+                state="readonly",
+            )
+            lang_combo.grid(row=0, column=1, sticky="nsew")
+            lang_combo.bind("<<ComboboxSelected>>", self.dump_config)
+            Quality_Frame.grid_columnconfigure(1, weight=1)
+
         with TKFrame(**pack_config) as Proxy_Frame:
             text = "代理地址(空值则不代理)"
             tk.Label(Proxy_Frame, text=text).grid(row=0, column=0, sticky="nsew")
             entry = tk.Entry(Proxy_Frame, textvariable=self.proxy)
             entry.grid(row=0, column=1, sticky="nsew")
             Proxy_Frame.grid_columnconfigure(1, weight=1)
-            
 
         with TKLabelFrame(
             frame={"text": "AutoSub 生成机翻字幕"},
@@ -242,49 +282,60 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
 
             gen_btn = tk.Button(Trans_Frame, text="自动生成并上传字幕", command=self.autoSub_run)
             gen_btn.pack(side="top", fill="x", padx=5, pady=5)
-            
 
         with TKLabelFrame(
             frame={"text": "Youtube 上传视频获取机翻字幕"},
             pack={"side": "top", "fill": "x", "padx": 5, "pady": 5},
         ) as Youtube_Frame:
-            
-            # TODO 双速字幕上传
-            with TKFrame(Youtube_Frame,**pack_config) as Cookie_Frame:
+
+            # NOTE 双语字幕上传 Checkbox 确认
+            c1 = tk.Checkbutton(
+                Youtube_Frame,
+                text="中文字幕下载并上传",
+                variable=self.youtube_cn,
+                onvalue=1,
+                offvalue=0,
+                command=self.dump_config,
+            )
+            c1.pack(side="top", fill="x", padx=5, pady=5)
+            with TKFrame(Youtube_Frame, **pack_config) as Cookie_Frame:
                 text = "Youtube 登陆 Cookie"
                 tk.Label(Cookie_Frame, text=text).grid(row=0, column=0, sticky="nsew")
                 entry = tk.Entry(Cookie_Frame, textvariable=self.youtube_cookie)
                 entry.grid(row=0, column=1, sticky="nsew")
                 Cookie_Frame.grid_columnconfigure(1, weight=1)
-                
-            pack_config = {"side": "top", "fill": "x", "padx": 15, "pady": 5}
-            gen_btn = tk.Button(Youtube_Frame, text="自动生成并上传字幕", command=self.autoSub_run)
+
+            gen_btn = tk.Button(
+                Youtube_Frame, text="自动生成并上传字幕", command=self.youtube_run
+            )
             gen_btn.pack(side="top", fill="x", padx=5, pady=5)
 
-        # TODO 字幕批量上传
         with TKLabelFrame(
             frame={"text": "批量上传现有字幕"},
             pack={"side": "top", "fill": "x", "padx": 5, "pady": 5},
         ) as Upload_Frame:
-            
-            with TKFrame(**pack_config) as Lang_Frame:
+
+            with TKFrame(Upload_Frame, **pack_config) as Lang_Frame:
                 label = tk.Label(Lang_Frame, text="选择语言")
                 label.grid(row=0, column=0, sticky="nsew")
 
                 lang_combo = ttk.Combobox(
-                    Lang_Frame, textvariable=self.lang_index, state="readonly"
+                    Lang_Frame,
+                    textvariable=self.lang_index,
+                    values=self.lang_index.list_data,
+                    state="readonly",
                 )
                 lang_combo.grid(row=0, column=1, sticky="nsew")
                 lang_combo["values"] = LANG_LIST
                 lang_combo.bind("<<ComboboxSelected>>", self.dump_config)
                 Lang_Frame.grid_columnconfigure(1, weight=1)
-                
+
             gen_btn = tk.Button(
                 Upload_Frame, text="选择字幕文件进行上传", command=self.upload_subtile
             )
             gen_btn.pack(side="top", fill="x", padx=5, pady=5)
 
-    def helpWin(self):
+    def show_help_win(self):
         # NOTE 删除重复的窗口
         if self.help_win and self.help_win.winfo_exists():
             self.help_win.destroy()
@@ -332,7 +383,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
 
     @check_variable.__func__
     def autoSub_run(self):
-        
+
         autosub = os.path.join(__file__, "..", "autosub", "autosub.exe")
         if not os.path.isfile(autosub):
             msg = f"{autosub} 路径不存在\n请到 https://github.com/BingLingGroup/autosub/releases 页面下载最新版本的 autosub.exe 程序"
@@ -340,22 +391,24 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             tk.messagebox.showwarning("警告", msg)
             return
 
+        proxy = self.proxy.get()
         for bvid in self.bvid_list:
-            self.bvid = bvid 
+            self.bvid = bvid
 
             # NOTE 查询下载的视频对应的 oid
-            info = self.get_video_info()
+            info = self.get_video_info(bvid)
 
             # NOTE 下载视频
             self.download_video()
 
             # NOTE 修改视频名称为 oid
-            title = info.get("title").replace("&","&amp;")
+            title = info.get("title").replace("&amp;", "&")
             pages = info.get("pages")
 
-            video = os.path.join(__file__, "..", "video", f"{title} - bilibili", "Videos")
+            video = os.path.join(
+                __file__, "..", "video", f"{title} - bilibili", "Videos"
+            )
 
-            proxy = self.proxy.get()
             for p, oid in pages.items():
                 src = os.path.join(video, f"{p}.mp4")
                 if not os.path.isfile(src):
@@ -377,9 +430,68 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
 
                 os.rename(src, srt_path)
 
-                self.submit_subtitle(srt_path)
+                subtitle = self.srt2bcc(srt_path)
+                self.submit_subtitle(subtitle, oid, self.lang)
 
         tk.messagebox.showinfo("恭喜你", f"{self.bvid} 字幕上传成功")
+
+    @check_variable.__func__
+    def youtube_run(self):
+        youtube = os.path.join(__file__, "..", "youtube")
+        youtubeuploader = os.path.join(youtube, "youtubeuploader.exe")
+        secrets = os.path.join(youtube, "client_secrets.json")
+        token = os.path.join(youtube, "request.token")
+
+        if not os.path.exists(youtubeuploader):
+            msg = f"{youtubeuploader} 路径不存在"
+            print(msg)
+            tk.messagebox.showwarning("警告", msg)
+            return
+        elif not os.path.exists(token):
+            msg = f"{token} 路径不存在"
+            print(msg)
+            tk.messagebox.showwarning("警告", msg)
+            return
+        elif not os.path.exists(secrets):
+            msg = f"{secrets} 路径不存在"
+            print(msg)
+            tk.messagebox.showwarning("警告", msg)
+            return
+
+        for bvid in self.bvid_list:
+            self.bvid = bvid
+            info = self.get_video_info(bvid)
+
+            # NOTE 下载视频
+            self.download_video()
+
+            # NOTE 修改视频名称为 oid
+            title = info.get("title").replace("&amp;", "&")
+            pages = info.get("pages")
+
+            video = os.path.join(
+                __file__, "..", "video", f"{title} - bilibili", "Videos"
+            )
+
+            for p, oid in pages.items():
+                src = os.path.join(video, f"{p}.mp4")
+                if not os.path.isfile(src):
+                    continue
+                    
+                # TODO 上传到 youtube
+                res = subprocess.check_output(
+                    [
+                        youtubeuploader,
+                        "-filename",
+                        src,
+                        "-secrets",
+                        secrets,
+                        "-cache",
+                        token,
+                    ]
+                )
+
+                # TODO 下载 youtube 字幕
 
     @check_variable.__func__
     def upload_subtile(self):
@@ -387,18 +499,24 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         if not directory:
             return
 
-        # TODO
         info = self.get_video_info()
         pages = info.get("pages")
         for root, _, files in os.walk(directory):
             for f in files:
                 name = f[: -len(".srt")]
-                if not f.endswith(".srt") or name not in pages:
-                    continue
                 oid = pages.get(name)
-                srt_path = os.path.join(root, f)
-                os.remove(srt_path) if os.path.isfile(srt_path) else None
-                self.submit_subtitle(srt_path,self.lang)
+                if oid:
+                    continue
+
+                path = os.path.join(root, f)
+                if f.endswith(".srt"):
+                    subtitle = self.srt2bcc(path)
+                elif f.endswith(".vtt"):
+                    subtitle = self.vtt2bcc(path)
+                else:
+                    continue
+
+                self.submit_subtitle(subtitle, oid, self.lang)
 
     @property
     def bvid_list(self):
@@ -412,6 +530,10 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
     @property
     def lang(self):
         return self.lang_index.list_data[self.lang_index.get()]
+
+    @property
+    def quality(self):
+        return self.video_quality_index.list_data[self.video_quality_index.get()]
 
     def get_video_info(self, bvid=""):
         bvid = bvid if bvid else self.bvid
@@ -443,18 +565,16 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
                 "--playlist-type",
                 "no",
                 "-q",
-                "16",
+                f"{VIDEO_QUALITY_DICT.get(self.quality,16)}",
                 "--audio-quality",
                 "30280",
             ]
         )
 
-    def submit_subtitle(self, srt_path,lang="en-US"):
-
-        oid = os.path.splitext(os.path.basename(srt_path))[0]
-        subtitle = self.srt2bcc(srt_path)
-        if not subtitle:
-            print(f"{oid}.srt 文件为空 - 跳过")
+    def submit_subtitle(self, subtitle, oid, lang="en-US"):
+        subtitle = subtitle if isinstance(subtitle, dict) else {}
+        if not subtitle or not oid:
+            print(f"{oid} 文件为空 - 跳过")
             return
         subtitle = json.dumps(subtitle)
 
@@ -476,7 +596,6 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
 
 
 if __name__ == "__main__":
-    # submit_subtitle()
     root = tk.Tk()
     BiliBili_SubtitleGenerator(root)
     root.mainloop()
