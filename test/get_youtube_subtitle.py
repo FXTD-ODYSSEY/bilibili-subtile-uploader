@@ -2,9 +2,14 @@
 import requests
 import json
 import re
-import requests
+import os
 
-url = "https://www.youtube.com/watch?v=r2PJpoHNzh4"
+youtube_id = "c6yXvFF20U8"
+url = f"https://www.youtube.com/watch?v={youtube_id}"
+
+config = os.path.join(__file__,'..','..','config.json')
+with open(config,'r') as f:
+    config = json.load(f)
 
 payload = {}
 headers = {
@@ -16,30 +21,29 @@ headers = {
     'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
     # 'accept-encoding': 'gzip, deflate, br',
     'accept-language': 'zh-CN,zh;q=0.9',
-    'cookie': ''
+    'cookie': config.get('youtube_cookie','')
 }
 
 response = requests.request("GET", url, headers=headers, data = payload)
 
 html = response.text
-# print(html)
 
-# with open('test.html','w') as f:
-#     f.write(html)
-
-
+zh = False
 pattern = re.escape(r'"captionTracks":[{"baseUrl":')
 regx = re.search(f'{pattern}"(.*?)"',html)
 if regx:
     url = regx.group(1)
     url = url.replace(r'\u0026',"&")
     url += "&fmt=vtt"
-    # url += "&tlang=zh-Hans"
+    url += "&tlang=zh-Hans" if zh else ""
     vtt = requests.request("GET", url)
     # # NOTE 清除 youtube vtt 第5行 空行
     text = vtt.text
-    text = "\n".join([line for i,line in enumerate(text.splitlines()) if i != 5])
-    with open('test.vtt','w',encoding="utf-8") as f:
+    if zh:
+        text = "\n".join([line for i,line in enumerate(text.splitlines()[:-4]) ])
+    else:
+        text = "\n".join([line for i,line in enumerate(text.splitlines()) if i != 5])
+    with open('test/test.vtt','w',encoding="utf-8") as f:
         f.write(text)
 else:
     print("not match")

@@ -31,6 +31,8 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog, messagebox
 
+from selenium_firefox import YouTubeUploader
+
 LANG_LIST = [
     "en-US",
     "zh-CN",
@@ -276,6 +278,10 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
 
         self.youtube_cookie = tk.StringVar()
         self.youtube_cookie.trace("w", self.dump_config)
+        self.youtube_username = tk.StringVar()
+        self.youtube_username.trace("w", self.dump_config)
+        self.youtube_password = tk.StringVar()
+        self.youtube_password.trace("w", self.dump_config)
         self.youtube_cn = tk.IntVar()
 
         self.lang_index = ListVar()
@@ -359,10 +365,25 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
                 entry = tk.Entry(Cookie_Frame, textvariable=self.youtube_cookie)
                 entry.grid(row=0, column=1, sticky="nsew")
                 Cookie_Frame.grid_columnconfigure(1, weight=1)
+                
+            with TKFrame(Youtube_Frame, **pack_config) as Username_Frame:
+                text = "Yotube 用户名"
+                tk.Label(Username_Frame, text=text).grid(row=0, column=0, sticky="nsew")
+                entry = tk.Entry(Username_Frame, textvariable=self.youtube_username)
+                entry.grid(row=0, column=1, sticky="nsew")
+                Username_Frame.grid_columnconfigure(1, weight=1)
+                
+            with TKFrame(Youtube_Frame, **pack_config) as Password_Frame:
+                text = "Yotube 登陆密码"
+                tk.Label(Password_Frame, text=text).grid(row=0, column=0, sticky="nsew")
+                entry = tk.Entry(Password_Frame, textvariable=self.youtube_password)
+                entry.grid(row=0, column=1, sticky="nsew")
+                Password_Frame.grid_columnconfigure(1, weight=1)
 
             gen_btn = tk.Button(
-                Youtube_Frame, text="上传 youtube 视频", command=self.youtube_run
+                Youtube_Frame, text="上传 youtube 视频", command=self.youtube_selenium_run
             )
+            
             gen_btn.pack(side="top", fill="x", padx=5, pady=5)
 
             gen_btn = tk.Button(
@@ -540,20 +561,21 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
                 src = os.path.join(video, f"{p}.mp4")
                 if not os.path.isfile(src):
                     continue
-
-                # NOTE 上传到 youtube
-                res = subprocess.check_output(
+                command = " ".join(
                     [
-                        youtubeuploader,
+                        os.path.abspath(youtubeuploader),
                         "-filename",
-                        src,
+                        f'"{os.path.abspath(src)}"',
                         "-secrets",
-                        secrets,
+                        os.path.abspath(secrets),
                         "-cache",
-                        token,
+                        os.path.abspath(token),
                     ]
                 )
-
+                
+                # NOTE 上传到 youtube
+                res = subprocess.check_output(command)
+                
                 # NOTE 获取上传的 id
                 res = res.decode("utf-8")
                 regx = re.compile(r"Video ID: (.*)")
@@ -561,24 +583,76 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
                 if grp:
                     youtube_id = grp.group(1)
                     youtube2oid[youtube_id] = oid
+                    print(f"{youtube_id} 上传成功")
 
             output = os.path.join(self.youtube_folder, f"{bvid}.json")
             with open(output, "w") as f:
                 json.dump(youtube2oid, f, indent=4)
+                
+                
+    @check_variable.__func__
+    def youtube_selenium_run(self):
+        
+        uploader = YouTubeUploader('')
+        uploader.username = self.youtube_username.get()
+        uploader.password = self.youtube_password.get()
+        for bvid in self.bvid_list:
+            self.bvid = bvid
+            output = os.path.join(self.youtube_folder, f"{bvid}.json")
+            data = {}
+            if os.path.exists(output):
+                with open(output, 'r') as f:
+                    data = json.load(f)
+                    data = {v:k for k,v in data.items()}
+
+            info = self.get_video_info(bvid)
+
+            # NOTE 下载视频
+            self.download_video(bvid)
+
+            # NOTE 修改视频名称为 oid
+            title = info.get("title").replace("&amp;", "&")
+            pages = info.get("pages")
+
+            video = os.path.join(
+                __file__, "..", "video", f"{title} - bilibili", "Videos"
+            )
+
+            youtube2oid = {}
+            for p, oid in pages.items():
+                src = os.path.join(video, f"{p}.mp4")
+                if not os.path.isfile(src):
+                    print(f"{src} 视频源找不到 - 跳过")
+                    continue
+                elif data.get(oid):
+                    print(f"{oid} 已经上传到 Youtube - 跳过")
+                    continue
+                
+                uploader.video_path = src
+                was_video_uploaded, youtube_id = uploader.upload()
+                if was_video_uploaded:
+                    youtube2oid[youtube_id] = oid
+                    print(f"{youtube_id} 上传成功")
+
+                with open(output, "w") as f:
+                    json.dump(youtube2oid, f, indent=4)
+        
+        uploader.quit()
+        print("视频上传完成")
 
     @check_variable.__func__
     def submit_youtube_subtitle_run(self):
         for j in os.listdir(self.youtube_folder):
             if not j.endswith(".json"):
                 continue
-            
+
             output = os.path.join(self.youtube_folder, j)
             self.bvid = j[:-5]
             with open(output, "r") as f:
                 data = json.load(f)
                 if data.get("upload"):
                     continue
-                
+
             print(f"上传 {j}")
 
             cookie = self.youtube_cookie.get()
@@ -595,11 +669,13 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             with open(output, "w") as f:
                 json.dump(data, f, indent=4)
 
-    def get_youtube_vtt(self, youtube_id, youtube_cookie="", zh=False, count=0,max_count=4):
+    def get_youtube_vtt(
+        self, youtube_id, youtube_cookie="", zh=False, count=0, max_count=4
+    ):
 
         if count > max_count:
             print(f"Skip {youtube_id} ...")
-            return ''
+            return ""
 
         youtube_cookie = youtube_cookie if youtube_cookie else self.youtube_cookie.get()
         url = f"https://www.youtube.com/watch?v={youtube_id}"
@@ -745,7 +821,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         url = "https://api.bilibili.com/x/v2/dm/subtitle/draft/save"
         response = requests.request("POST", url, headers=headers, data=payload)
 
-        res = response.text.encode("utf8")
+        res = response.text
         print(f"{bvid} {oid} -> {res}")
 
 
