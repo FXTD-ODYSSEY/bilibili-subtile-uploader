@@ -1,0 +1,1702 @@
+WEBVTT
+Kind: captions
+Language: en
+
+00:00:06.319 --> 00:00:08.470 align:start position:0%
+now<00:00:06.480><c> that</c><00:00:06.640><c> we've</c><00:00:06.879><c> identified</c><00:00:07.600><c> which</c><00:00:07.919><c> textures</c>
+
+00:00:08.470 --> 00:00:08.480 align:start position:0%
+now that we've identified which textures
+ 
+
+00:00:08.480 --> 00:00:10.310 align:start position:0%
+now that we've identified which textures
+are<00:00:08.720><c> incompatible</c><00:00:09.519><c> with</c><00:00:09.760><c> our</c><00:00:09.840><c> list</c><00:00:10.160><c> of</c>
+
+00:00:10.310 --> 00:00:10.320 align:start position:0%
+are incompatible with our list of
+ 
+
+00:00:10.320 --> 00:00:12.230 align:start position:0%
+are incompatible with our list of
+acceptable<00:00:10.960><c> image</c><00:00:11.200><c> dimensions</c>
+
+00:00:12.230 --> 00:00:12.240 align:start position:0%
+acceptable image dimensions
+ 
+
+00:00:12.240 --> 00:00:14.070 align:start position:0%
+acceptable image dimensions
+we'd<00:00:12.400><c> like</c><00:00:12.639><c> to</c><00:00:12.719><c> know</c><00:00:12.960><c> which</c><00:00:13.200><c> scene</c><00:00:13.519><c> elements</c>
+
+00:00:14.070 --> 00:00:14.080 align:start position:0%
+we'd like to know which scene elements
+ 
+
+00:00:14.080 --> 00:00:16.950 align:start position:0%
+we'd like to know which scene elements
+these<00:00:14.320><c> textures</c><00:00:14.799><c> have</c><00:00:14.880><c> been</c><00:00:15.120><c> applied</c><00:00:15.440><c> to</c>
+
+00:00:16.950 --> 00:00:16.960 align:start position:0%
+these textures have been applied to
+ 
+
+00:00:16.960 --> 00:00:18.550 align:start position:0%
+these textures have been applied to
+to<00:00:17.119><c> do</c><00:00:17.359><c> that</c><00:00:17.760><c> we'll</c><00:00:17.920><c> need</c><00:00:18.080><c> a</c><00:00:18.160><c> bit</c><00:00:18.320><c> more</c>
+
+00:00:18.550 --> 00:00:18.560 align:start position:0%
+to do that we'll need a bit more
+ 
+
+00:00:18.560 --> 00:00:20.550 align:start position:0%
+to do that we'll need a bit more
+information<00:00:19.279><c> about</c><00:00:19.520><c> how</c><00:00:19.840><c> objects</c><00:00:20.320><c> are</c>
+
+00:00:20.550 --> 00:00:20.560 align:start position:0%
+information about how objects are
+ 
+
+00:00:20.560 --> 00:00:22.950 align:start position:0%
+information about how objects are
+organized<00:00:21.199><c> in</c><00:00:21.279><c> the</c><00:00:21.439><c> fbx</c><00:00:22.000><c> sdk</c>
+
+00:00:22.950 --> 00:00:22.960 align:start position:0%
+organized in the fbx sdk
+ 
+
+00:00:22.960 --> 00:00:25.029 align:start position:0%
+organized in the fbx sdk
+and<00:00:23.119><c> how</c><00:00:23.279><c> this</c><00:00:23.519><c> organization</c><00:00:24.400><c> relates</c><00:00:24.800><c> to</c><00:00:24.960><c> a</c>
+
+00:00:25.029 --> 00:00:25.039 align:start position:0%
+and how this organization relates to a
+ 
+
+00:00:25.039 --> 00:00:28.230 align:start position:0%
+and how this organization relates to a
+content<00:00:25.439><c> development</c><00:00:25.920><c> tool</c><00:00:26.320><c> like</c><00:00:26.640><c> maya</c>
+
+00:00:28.230 --> 00:00:28.240 align:start position:0%
+content development tool like maya
+ 
+
+00:00:28.240 --> 00:00:30.870 align:start position:0%
+content development tool like maya
+let's<00:00:28.480><c> continue</c><00:00:29.039><c> using</c><00:00:29.279><c> the</c><00:00:29.880><c> cubeman.fbx</c>
+
+00:00:30.870 --> 00:00:30.880 align:start position:0%
+let's continue using the cubeman.fbx
+ 
+
+00:00:30.880 --> 00:00:33.430 align:start position:0%
+let's continue using the cubeman.fbx
+character<00:00:31.439><c> as</c><00:00:31.599><c> an</c><00:00:31.760><c> example</c>
+
+00:00:33.430 --> 00:00:33.440 align:start position:0%
+character as an example
+ 
+
+00:00:33.440 --> 00:00:35.510 align:start position:0%
+character as an example
+if<00:00:33.520><c> we</c><00:00:33.680><c> open</c><00:00:33.920><c> the</c><00:00:34.079><c> file</c><00:00:34.399><c> in</c><00:00:34.480><c> maya</c><00:00:35.040><c> and</c><00:00:35.200><c> look</c><00:00:35.440><c> at</c>
+
+00:00:35.510 --> 00:00:35.520 align:start position:0%
+if we open the file in maya and look at
+ 
+
+00:00:35.520 --> 00:00:36.549 align:start position:0%
+if we open the file in maya and look at
+the<00:00:35.680><c> outliner</c>
+
+00:00:36.549 --> 00:00:36.559 align:start position:0%
+the outliner
+ 
+
+00:00:36.559 --> 00:00:39.110 align:start position:0%
+the outliner
+the<00:00:36.800><c> chest</c><00:00:37.120><c> is</c><00:00:37.280><c> the</c><00:00:37.440><c> parent</c><00:00:37.760><c> of</c><00:00:37.920><c> the</c><00:00:38.079><c> head</c><00:00:38.640><c> arms</c>
+
+00:00:39.110 --> 00:00:39.120 align:start position:0%
+the chest is the parent of the head arms
+ 
+
+00:00:39.120 --> 00:00:39.910 align:start position:0%
+the chest is the parent of the head arms
+and<00:00:39.280><c> legs</c>
+
+00:00:39.910 --> 00:00:39.920 align:start position:0%
+and legs
+ 
+
+00:00:39.920 --> 00:00:43.030 align:start position:0%
+and legs
+while<00:00:40.160><c> the</c><00:00:40.320><c> head</c><00:00:40.719><c> is</c><00:00:40.800><c> the</c><00:00:40.960><c> parent</c><00:00:41.360><c> of</c><00:00:41.440><c> the</c><00:00:41.600><c> hat</c>
+
+00:00:43.030 --> 00:00:43.040 align:start position:0%
+while the head is the parent of the hat
+ 
+
+00:00:43.040 --> 00:00:45.510 align:start position:0%
+while the head is the parent of the hat
+this<00:00:43.280><c> way</c><00:00:43.680><c> if</c><00:00:43.840><c> we</c><00:00:44.000><c> rotate</c><00:00:44.399><c> the</c><00:00:44.559><c> head</c><00:00:45.039><c> the</c><00:00:45.200><c> hat</c>
+
+00:00:45.510 --> 00:00:45.520 align:start position:0%
+this way if we rotate the head the hat
+ 
+
+00:00:45.520 --> 00:00:47.350 align:start position:0%
+this way if we rotate the head the hat
+will<00:00:45.680><c> rotate</c><00:00:46.079><c> as</c><00:00:46.239><c> well</c>
+
+00:00:47.350 --> 00:00:47.360 align:start position:0%
+will rotate as well
+ 
+
+00:00:47.360 --> 00:00:49.750 align:start position:0%
+will rotate as well
+likewise<00:00:48.000><c> if</c><00:00:48.160><c> we</c><00:00:48.320><c> move</c><00:00:48.559><c> the</c><00:00:48.800><c> chest</c><00:00:49.360><c> the</c><00:00:49.520><c> rest</c>
+
+00:00:49.750 --> 00:00:49.760 align:start position:0%
+likewise if we move the chest the rest
+ 
+
+00:00:49.760 --> 00:00:51.670 align:start position:0%
+likewise if we move the chest the rest
+of<00:00:49.920><c> the</c><00:00:50.000><c> character</c><00:00:50.559><c> will</c><00:00:50.719><c> follow</c><00:00:51.120><c> along</c><00:00:51.440><c> with</c>
+
+00:00:51.670 --> 00:00:51.680 align:start position:0%
+of the character will follow along with
+ 
+
+00:00:51.680 --> 00:00:52.869 align:start position:0%
+of the character will follow along with
+it
+
+00:00:52.869 --> 00:00:52.879 align:start position:0%
+it
+ 
+
+00:00:52.879 --> 00:00:57.029 align:start position:0%
+it
+in<00:00:53.120><c> maya</c><00:00:53.680><c> the</c><00:00:53.920><c> chest</c><00:00:54.559><c> head</c><00:00:55.199><c> hat</c><00:00:55.840><c> arms</c><00:00:56.320><c> and</c><00:00:56.480><c> legs</c>
+
+00:00:57.029 --> 00:00:57.039 align:start position:0%
+in maya the chest head hat arms and legs
+ 
+
+00:00:57.039 --> 00:00:59.029 align:start position:0%
+in maya the chest head hat arms and legs
+are<00:00:57.199><c> known</c><00:00:57.440><c> as</c><00:00:57.600><c> transform</c><00:00:58.239><c> nodes</c><00:00:58.800><c> which</c>
+
+00:00:59.029 --> 00:00:59.039 align:start position:0%
+are known as transform nodes which
+ 
+
+00:00:59.039 --> 00:01:00.389 align:start position:0%
+are known as transform nodes which
+control<00:00:59.440><c> the</c><00:00:59.600><c> position</c>
+
+00:01:00.389 --> 00:01:00.399 align:start position:0%
+control the position
+ 
+
+00:01:00.399 --> 00:01:02.709 align:start position:0%
+control the position
+rotation<00:01:01.039><c> and</c><00:01:01.280><c> scale</c><00:01:01.760><c> of</c><00:01:01.840><c> their</c><00:01:02.079><c> underlying</c>
+
+00:01:02.709 --> 00:01:02.719 align:start position:0%
+rotation and scale of their underlying
+ 
+
+00:01:02.719 --> 00:01:04.789 align:start position:0%
+rotation and scale of their underlying
+shape<00:01:03.039><c> nodes</c>
+
+00:01:04.789 --> 00:01:04.799 align:start position:0%
+shape nodes
+ 
+
+00:01:04.799 --> 00:01:06.469 align:start position:0%
+shape nodes
+to<00:01:04.960><c> display</c><00:01:05.360><c> these</c><00:01:05.600><c> shape</c><00:01:05.920><c> nodes</c><00:01:06.240><c> in</c><00:01:06.320><c> the</c>
+
+00:01:06.469 --> 00:01:06.479 align:start position:0%
+to display these shape nodes in the
+ 
+
+00:01:06.479 --> 00:01:07.830 align:start position:0%
+to display these shape nodes in the
+outliner<00:01:07.200><c> select</c>
+
+00:01:07.830 --> 00:01:07.840 align:start position:0%
+outliner select
+ 
+
+00:01:07.840 --> 00:01:11.350 align:start position:0%
+outliner select
+display<00:01:08.720><c> shapes</c><00:01:10.400><c> a</c><00:01:10.560><c> shape</c><00:01:10.880><c> node</c>
+
+00:01:11.350 --> 00:01:11.360 align:start position:0%
+display shapes a shape node
+ 
+
+00:01:11.360 --> 00:01:13.429 align:start position:0%
+display shapes a shape node
+determines<00:01:11.920><c> the</c><00:01:12.080><c> specialized</c><00:01:12.720><c> data</c><00:01:13.119><c> of</c><00:01:13.280><c> an</c>
+
+00:01:13.429 --> 00:01:13.439 align:start position:0%
+determines the specialized data of an
+ 
+
+00:01:13.439 --> 00:01:14.550 align:start position:0%
+determines the specialized data of an
+object<00:01:13.840><c> in</c><00:01:14.000><c> the</c><00:01:14.159><c> scene</c>
+
+00:01:14.550 --> 00:01:14.560 align:start position:0%
+object in the scene
+ 
+
+00:01:14.560 --> 00:01:17.350 align:start position:0%
+object in the scene
+such<00:01:14.799><c> as</c><00:01:14.960><c> a</c><00:01:15.119><c> mesh</c><00:01:15.600><c> a</c><00:01:15.759><c> light</c><00:01:16.240><c> a</c><00:01:16.320><c> camera</c><00:01:16.960><c> and</c><00:01:17.119><c> so</c>
+
+00:01:17.350 --> 00:01:17.360 align:start position:0%
+such as a mesh a light a camera and so
+ 
+
+00:01:17.360 --> 00:01:18.950 align:start position:0%
+such as a mesh a light a camera and so
+on
+
+00:01:18.950 --> 00:01:18.960 align:start position:0%
+on
+ 
+
+00:01:18.960 --> 00:01:21.749 align:start position:0%
+on
+for<00:01:19.119><c> example</c><00:01:20.000><c> the</c><00:01:20.159><c> hat</c><00:01:20.479><c> shape</c><00:01:20.799><c> node</c><00:01:21.280><c> defines</c>
+
+00:01:21.749 --> 00:01:21.759 align:start position:0%
+for example the hat shape node defines
+ 
+
+00:01:21.759 --> 00:01:23.109 align:start position:0%
+for example the hat shape node defines
+the<00:01:21.840><c> hat's</c><00:01:22.240><c> mesh</c><00:01:22.560><c> data</c>
+
+00:01:23.109 --> 00:01:23.119 align:start position:0%
+the hat's mesh data
+ 
+
+00:01:23.119 --> 00:01:25.670 align:start position:0%
+the hat's mesh data
+including<00:01:23.600><c> its</c><00:01:23.759><c> vertices</c><00:01:24.560><c> its</c><00:01:24.799><c> faces</c><00:01:25.439><c> its</c>
+
+00:01:25.670 --> 00:01:25.680 align:start position:0%
+including its vertices its faces its
+ 
+
+00:01:25.680 --> 00:01:28.230 align:start position:0%
+including its vertices its faces its
+normals<00:01:26.240><c> and</c><00:01:26.400><c> its</c><00:01:26.560><c> uvs</c>
+
+00:01:28.230 --> 00:01:28.240 align:start position:0%
+normals and its uvs
+ 
+
+00:01:28.240 --> 00:01:30.630 align:start position:0%
+normals and its uvs
+the<00:01:28.400><c> terminology</c><00:01:29.280><c> of</c><00:01:29.439><c> transform</c><00:01:30.000><c> node</c><00:01:30.400><c> and</c>
+
+00:01:30.630 --> 00:01:30.640 align:start position:0%
+the terminology of transform node and
+ 
+
+00:01:30.640 --> 00:01:31.350 align:start position:0%
+the terminology of transform node and
+shape<00:01:30.960><c> node</c>
+
+00:01:31.350 --> 00:01:31.360 align:start position:0%
+shape node
+ 
+
+00:01:31.360 --> 00:01:34.870 align:start position:0%
+shape node
+is<00:01:31.520><c> specific</c><00:01:32.000><c> to</c><00:01:32.240><c> maya</c><00:01:33.280><c> in</c><00:01:33.439><c> the</c><00:01:33.600><c> fbx</c><00:01:34.159><c> sdk</c>
+
+00:01:34.870 --> 00:01:34.880 align:start position:0%
+is specific to maya in the fbx sdk
+ 
+
+00:01:34.880 --> 00:01:37.109 align:start position:0%
+is specific to maya in the fbx sdk
+a<00:01:35.040><c> transform</c><00:01:35.600><c> node</c><00:01:36.000><c> is</c><00:01:36.079><c> simply</c><00:01:36.479><c> known</c><00:01:36.799><c> as</c><00:01:36.960><c> a</c>
+
+00:01:37.109 --> 00:01:37.119 align:start position:0%
+a transform node is simply known as a
+ 
+
+00:01:37.119 --> 00:01:38.710 align:start position:0%
+a transform node is simply known as a
+node<00:01:37.600><c> and</c><00:01:37.840><c> is</c><00:01:38.000><c> represented</c>
+
+00:01:38.710 --> 00:01:38.720 align:start position:0%
+node and is represented
+ 
+
+00:01:38.720 --> 00:01:42.230 align:start position:0%
+node and is represented
+by<00:01:38.880><c> an</c><00:01:39.119><c> instance</c><00:01:39.600><c> of</c><00:01:39.920><c> fbx</c><00:01:40.640><c> node</c>
+
+00:01:42.230 --> 00:01:42.240 align:start position:0%
+by an instance of fbx node
+ 
+
+00:01:42.240 --> 00:01:43.910 align:start position:0%
+by an instance of fbx node
+the<00:01:42.399><c> concept</c><00:01:42.880><c> of</c><00:01:43.040><c> a</c><00:01:43.119><c> shape</c><00:01:43.439><c> node</c><00:01:43.759><c> is</c>
+
+00:01:43.910 --> 00:01:43.920 align:start position:0%
+the concept of a shape node is
+ 
+
+00:01:43.920 --> 00:01:45.910 align:start position:0%
+the concept of a shape node is
+equivalent<00:01:44.560><c> to</c><00:01:44.720><c> a</c><00:01:44.880><c> node</c><00:01:45.200><c> attribute</c>
+
+00:01:45.910 --> 00:01:45.920 align:start position:0%
+equivalent to a node attribute
+ 
+
+00:01:45.920 --> 00:01:48.710 align:start position:0%
+equivalent to a node attribute
+and<00:01:46.159><c> is</c><00:01:46.240><c> represented</c><00:01:46.960><c> by</c><00:01:47.119><c> an</c><00:01:47.360><c> instance</c><00:01:47.840><c> of</c><00:01:48.159><c> fbx</c>
+
+00:01:48.710 --> 00:01:48.720 align:start position:0%
+and is represented by an instance of fbx
+ 
+
+00:01:48.720 --> 00:01:51.030 align:start position:0%
+and is represented by an instance of fbx
+node<00:01:49.040><c> attribute</c>
+
+00:01:51.030 --> 00:01:51.040 align:start position:0%
+node attribute
+ 
+
+00:01:51.040 --> 00:01:52.950 align:start position:0%
+node attribute
+nodes<00:01:51.360><c> determine</c><00:01:52.000><c> where</c><00:01:52.159><c> their</c><00:01:52.479><c> attached</c>
+
+00:01:52.950 --> 00:01:52.960 align:start position:0%
+nodes determine where their attached
+ 
+
+00:01:52.960 --> 00:01:54.870 align:start position:0%
+nodes determine where their attached
+node<00:01:53.280><c> attribute</c><00:01:53.920><c> is</c><00:01:54.079><c> positioned</c>
+
+00:01:54.870 --> 00:01:54.880 align:start position:0%
+node attribute is positioned
+ 
+
+00:01:54.880 --> 00:01:57.990 align:start position:0%
+node attribute is positioned
+rotated<00:01:55.600><c> and</c><00:01:55.759><c> scaled</c><00:01:56.240><c> in</c><00:01:56.320><c> the</c><00:01:56.479><c> scene</c>
+
+00:01:57.990 --> 00:01:58.000 align:start position:0%
+rotated and scaled in the scene
+ 
+
+00:01:58.000 --> 00:02:00.950 align:start position:0%
+rotated and scaled in the scene
+like<00:01:58.320><c> transform</c><00:01:58.799><c> nodes</c><00:01:59.119><c> in</c><00:01:59.200><c> maya</c><00:02:00.000><c> fbx</c><00:02:00.640><c> nodes</c>
+
+00:02:00.950 --> 00:02:00.960 align:start position:0%
+like transform nodes in maya fbx nodes
+ 
+
+00:02:00.960 --> 00:02:02.709 align:start position:0%
+like transform nodes in maya fbx nodes
+can<00:02:01.119><c> be</c><00:02:01.280><c> arranged</c><00:02:01.840><c> in</c><00:02:02.000><c> a</c><00:02:02.079><c> parent</c><00:02:02.399><c> child</c>
+
+00:02:02.709 --> 00:02:02.719 align:start position:0%
+can be arranged in a parent child
+ 
+
+00:02:02.719 --> 00:02:03.590 align:start position:0%
+can be arranged in a parent child
+hierarchy
+
+00:02:03.590 --> 00:02:03.600 align:start position:0%
+hierarchy
+ 
+
+00:02:03.600 --> 00:02:05.830 align:start position:0%
+hierarchy
+to<00:02:03.840><c> affect</c><00:02:04.159><c> the</c><00:02:04.320><c> position</c><00:02:04.960><c> rotation</c><00:02:05.680><c> and</c>
+
+00:02:05.830 --> 00:02:05.840 align:start position:0%
+to affect the position rotation and
+ 
+
+00:02:05.840 --> 00:02:09.430 align:start position:0%
+to affect the position rotation and
+scale<00:02:06.320><c> of</c><00:02:06.479><c> their</c><00:02:06.719><c> child</c><00:02:07.040><c> nodes</c>
+
+00:02:09.430 --> 00:02:09.440 align:start position:0%
+scale of their child nodes
+ 
+
+00:02:09.440 --> 00:02:11.350 align:start position:0%
+scale of their child nodes
+materials<00:02:10.000><c> and</c><00:02:10.160><c> textures</c><00:02:10.800><c> also</c><00:02:11.120><c> work</c>
+
+00:02:11.350 --> 00:02:11.360 align:start position:0%
+materials and textures also work
+ 
+
+00:02:11.360 --> 00:02:14.869 align:start position:0%
+materials and textures also work
+similarly<00:02:12.000><c> in</c><00:02:12.239><c> maya</c><00:02:12.640><c> and</c><00:02:12.800><c> in</c><00:02:12.959><c> fbx</c>
+
+00:02:14.869 --> 00:02:14.879 align:start position:0%
+similarly in maya and in fbx
+ 
+
+00:02:14.879 --> 00:02:17.589 align:start position:0%
+similarly in maya and in fbx
+for<00:02:15.120><c> example</c><00:02:15.760><c> in</c><00:02:15.920><c> maya</c><00:02:16.480><c> we</c><00:02:16.640><c> can</c><00:02:16.800><c> assign</c><00:02:17.200><c> a</c><00:02:17.280><c> fong</c>
+
+00:02:17.589 --> 00:02:17.599 align:start position:0%
+for example in maya we can assign a fong
+ 
+
+00:02:17.599 --> 00:02:19.750 align:start position:0%
+for example in maya we can assign a fong
+material<00:02:18.160><c> to</c><00:02:18.319><c> a</c><00:02:18.400><c> sphere</c><00:02:18.879><c> to</c><00:02:19.120><c> change</c><00:02:19.360><c> the</c><00:02:19.520><c> way</c>
+
+00:02:19.750 --> 00:02:19.760 align:start position:0%
+material to a sphere to change the way
+ 
+
+00:02:19.760 --> 00:02:21.589 align:start position:0%
+material to a sphere to change the way
+it<00:02:19.920><c> bounces</c><00:02:20.319><c> light</c>
+
+00:02:21.589 --> 00:02:21.599 align:start position:0%
+it bounces light
+ 
+
+00:02:21.599 --> 00:02:23.750 align:start position:0%
+it bounces light
+this<00:02:21.840><c> material</c><00:02:22.480><c> has</c><00:02:22.720><c> several</c><00:02:23.040><c> properties</c>
+
+00:02:23.750 --> 00:02:23.760 align:start position:0%
+this material has several properties
+ 
+
+00:02:23.760 --> 00:02:25.270 align:start position:0%
+this material has several properties
+each<00:02:24.000><c> of</c><00:02:24.160><c> which</c><00:02:24.400><c> can</c><00:02:24.560><c> be</c><00:02:24.720><c> assigned</c>
+
+00:02:25.270 --> 00:02:25.280 align:start position:0%
+each of which can be assigned
+ 
+
+00:02:25.280 --> 00:02:28.390 align:start position:0%
+each of which can be assigned
+to<00:02:25.440><c> a</c><00:02:25.520><c> different</c><00:02:25.840><c> texture</c><00:02:27.440><c> we</c><00:02:27.599><c> can</c><00:02:27.760><c> assign</c><00:02:28.160><c> one</c>
+
+00:02:28.390 --> 00:02:28.400 align:start position:0%
+to a different texture we can assign one
+ 
+
+00:02:28.400 --> 00:02:30.229 align:start position:0%
+to a different texture we can assign one
+texture<00:02:28.879><c> to</c><00:02:29.040><c> the</c><00:02:29.200><c> color</c><00:02:29.520><c> property</c>
+
+00:02:30.229 --> 00:02:30.239 align:start position:0%
+texture to the color property
+ 
+
+00:02:30.239 --> 00:02:31.830 align:start position:0%
+texture to the color property
+to<00:02:30.400><c> give</c><00:02:30.560><c> the</c><00:02:30.720><c> basic</c><00:02:31.120><c> appearance</c><00:02:31.519><c> of</c><00:02:31.680><c> an</c>
+
+00:02:31.830 --> 00:02:31.840 align:start position:0%
+to give the basic appearance of an
+ 
+
+00:02:31.840 --> 00:02:33.830 align:start position:0%
+to give the basic appearance of an
+orange
+
+00:02:33.830 --> 00:02:33.840 align:start position:0%
+orange
+ 
+
+00:02:33.840 --> 00:02:35.670 align:start position:0%
+orange
+we<00:02:34.000><c> can</c><00:02:34.160><c> assign</c><00:02:34.560><c> another</c><00:02:34.879><c> texture</c><00:02:35.360><c> to</c><00:02:35.519><c> the</c>
+
+00:02:35.670 --> 00:02:35.680 align:start position:0%
+we can assign another texture to the
+ 
+
+00:02:35.680 --> 00:02:37.030 align:start position:0%
+we can assign another texture to the
+bump<00:02:35.920><c> mapping</c><00:02:36.319><c> property</c>
+
+00:02:37.030 --> 00:02:37.040 align:start position:0%
+bump mapping property
+ 
+
+00:02:37.040 --> 00:02:41.350 align:start position:0%
+bump mapping property
+to<00:02:37.200><c> give</c><00:02:37.360><c> the</c><00:02:37.519><c> orange</c><00:02:37.920><c> some</c><00:02:38.160><c> dimples</c>
+
+00:02:41.350 --> 00:02:41.360 align:start position:0%
+ 
+ 
+
+00:02:41.360 --> 00:02:43.830 align:start position:0%
+ 
+in<00:02:41.519><c> the</c><00:02:41.599><c> case</c><00:02:41.840><c> of</c><00:02:42.000><c> our</c><00:02:42.160><c> character</c><00:02:42.959><c> the</c><00:02:43.200><c> chest</c>
+
+00:02:43.830 --> 00:02:43.840 align:start position:0%
+in the case of our character the chest
+ 
+
+00:02:43.840 --> 00:02:44.470 align:start position:0%
+in the case of our character the chest
+head
+
+00:02:44.470 --> 00:02:44.480 align:start position:0%
+head
+ 
+
+00:02:44.480 --> 00:02:46.710 align:start position:0%
+head
+arms<00:02:44.879><c> and</c><00:02:45.040><c> legs</c><00:02:45.519><c> have</c><00:02:45.680><c> all</c><00:02:45.840><c> been</c><00:02:46.080><c> unwrapped</c><00:02:46.560><c> in</c>
+
+00:02:46.710 --> 00:02:46.720 align:start position:0%
+arms and legs have all been unwrapped in
+ 
+
+00:02:46.720 --> 00:02:47.990 align:start position:0%
+arms and legs have all been unwrapped in
+the<00:02:46.800><c> same</c><00:02:47.120><c> uv</c><00:02:47.519><c> space</c>
+
+00:02:47.990 --> 00:02:48.000 align:start position:0%
+the same uv space
+ 
+
+00:02:48.000 --> 00:02:50.309 align:start position:0%
+the same uv space
+and<00:02:48.160><c> have</c><00:02:48.319><c> all</c><00:02:48.480><c> been</c><00:02:48.640><c> given</c><00:02:48.959><c> the</c><00:02:49.120><c> same</c><00:02:49.519><c> cubeman</c>
+
+00:02:50.309 --> 00:02:50.319 align:start position:0%
+and have all been given the same cubeman
+ 
+
+00:02:50.319 --> 00:02:52.229 align:start position:0%
+and have all been given the same cubeman
+matte<00:02:50.640><c> material</c>
+
+00:02:52.229 --> 00:02:52.239 align:start position:0%
+matte material
+ 
+
+00:02:52.239 --> 00:02:54.309 align:start position:0%
+matte material
+the<00:02:52.480><c> cubeman</c><00:02:53.040><c> matte</c><00:02:53.280><c> material's</c><00:02:53.920><c> color</c>
+
+00:02:54.309 --> 00:02:54.319 align:start position:0%
+the cubeman matte material's color
+ 
+
+00:02:54.319 --> 00:02:56.350 align:start position:0%
+the cubeman matte material's color
+property<00:02:55.040><c> has</c><00:02:55.200><c> been</c><00:02:55.440><c> assigned</c><00:02:55.760><c> to</c><00:02:55.920><c> the</c>
+
+00:02:56.350 --> 00:02:56.360 align:start position:0%
+property has been assigned to the
+ 
+
+00:02:56.360 --> 00:02:57.509 align:start position:0%
+property has been assigned to the
+cubeman.png
+
+00:02:57.509 --> 00:02:57.519 align:start position:0%
+cubeman.png
+ 
+
+00:02:57.519 --> 00:03:00.949 align:start position:0%
+cubeman.png
+file<00:02:59.120><c> in</c><00:02:59.200><c> the</c><00:02:59.360><c> fbx</c><00:02:59.920><c> sdk</c>
+
+00:03:00.949 --> 00:03:00.959 align:start position:0%
+file in the fbx sdk
+ 
+
+00:03:00.959 --> 00:03:03.190 align:start position:0%
+file in the fbx sdk
+each<00:03:01.200><c> node</c><00:03:01.519><c> stores</c><00:03:01.840><c> the</c><00:03:02.000><c> materials</c><00:03:02.720><c> used</c><00:03:03.040><c> by</c>
+
+00:03:03.190 --> 00:03:03.200 align:start position:0%
+each node stores the materials used by
+ 
+
+00:03:03.200 --> 00:03:05.670 align:start position:0%
+each node stores the materials used by
+its<00:03:03.360><c> connected</c><00:03:03.840><c> node</c><00:03:04.159><c> attribute</c>
+
+00:03:05.670 --> 00:03:05.680 align:start position:0%
+its connected node attribute
+ 
+
+00:03:05.680 --> 00:03:07.509 align:start position:0%
+its connected node attribute
+each<00:03:06.000><c> material</c><00:03:06.640><c> has</c><00:03:06.879><c> its</c><00:03:07.040><c> own</c><00:03:07.200><c> set</c><00:03:07.440><c> of</c>
+
+00:03:07.509 --> 00:03:07.519 align:start position:0%
+each material has its own set of
+ 
+
+00:03:07.519 --> 00:03:09.430 align:start position:0%
+each material has its own set of
+properties<00:03:08.400><c> although</c><00:03:08.640><c> the</c><00:03:08.800><c> names</c><00:03:09.120><c> of</c><00:03:09.200><c> these</c>
+
+00:03:09.430 --> 00:03:09.440 align:start position:0%
+properties although the names of these
+ 
+
+00:03:09.440 --> 00:03:10.070 align:start position:0%
+properties although the names of these
+properties
+
+00:03:10.070 --> 00:03:10.080 align:start position:0%
+properties
+ 
+
+00:03:10.080 --> 00:03:12.229 align:start position:0%
+properties
+might<00:03:10.319><c> differ</c><00:03:10.640><c> slightly</c><00:03:11.200><c> between</c><00:03:11.599><c> maya</c><00:03:12.080><c> and</c>
+
+00:03:12.229 --> 00:03:12.239 align:start position:0%
+might differ slightly between maya and
+ 
+
+00:03:12.239 --> 00:03:14.070 align:start position:0%
+might differ slightly between maya and
+fbx
+
+00:03:14.070 --> 00:03:14.080 align:start position:0%
+fbx
+ 
+
+00:03:14.080 --> 00:03:16.630 align:start position:0%
+fbx
+for<00:03:14.239><c> example</c><00:03:14.959><c> in</c><00:03:15.120><c> maya</c><00:03:15.599><c> the</c><00:03:15.760><c> color</c><00:03:16.159><c> property</c>
+
+00:03:16.630 --> 00:03:16.640 align:start position:0%
+for example in maya the color property
+ 
+
+00:03:16.640 --> 00:03:17.990 align:start position:0%
+for example in maya the color property
+of<00:03:16.800><c> a</c><00:03:16.879><c> lambert</c><00:03:17.360><c> material</c>
+
+00:03:17.990 --> 00:03:18.000 align:start position:0%
+of a lambert material
+ 
+
+00:03:18.000 --> 00:03:19.990 align:start position:0%
+of a lambert material
+is<00:03:18.159><c> referred</c><00:03:18.560><c> to</c><00:03:18.879><c> as</c><00:03:19.040><c> the</c><00:03:19.200><c> diffuse</c><00:03:19.680><c> color</c>
+
+00:03:19.990 --> 00:03:20.000 align:start position:0%
+is referred to as the diffuse color
+ 
+
+00:03:20.000 --> 00:03:22.630 align:start position:0%
+is referred to as the diffuse color
+property<00:03:20.560><c> in</c><00:03:20.720><c> fbx</c>
+
+00:03:22.630 --> 00:03:22.640 align:start position:0%
+property in fbx
+ 
+
+00:03:22.640 --> 00:03:25.589 align:start position:0%
+property in fbx
+like<00:03:22.879><c> in</c><00:03:23.040><c> maya</c><00:03:23.680><c> fbx</c><00:03:24.239><c> material</c><00:03:24.720><c> properties</c><00:03:25.360><c> can</c>
+
+00:03:25.589 --> 00:03:25.599 align:start position:0%
+like in maya fbx material properties can
+ 
+
+00:03:25.599 --> 00:03:30.229 align:start position:0%
+like in maya fbx material properties can
+also<00:03:25.840><c> be</c><00:03:26.000><c> connected</c><00:03:26.560><c> to</c><00:03:26.720><c> textures</c>
+
+00:03:30.229 --> 00:03:30.239 align:start position:0%
+ 
+ 
+
+00:03:30.239 --> 00:03:32.390 align:start position:0%
+ 
+in<00:03:30.400><c> part</c><00:03:30.640><c> 1</c><00:03:30.879><c> of</c><00:03:30.959><c> this</c><00:03:31.120><c> tutorial</c><00:03:31.760><c> we</c><00:03:32.000><c> discovered</c>
+
+00:03:32.390 --> 00:03:32.400 align:start position:0%
+in part 1 of this tutorial we discovered
+ 
+
+00:03:32.400 --> 00:03:34.390 align:start position:0%
+in part 1 of this tutorial we discovered
+that<00:03:32.560><c> the</c><00:03:32.799><c> hat.png</c><00:03:33.840><c> texture</c>
+
+00:03:34.390 --> 00:03:34.400 align:start position:0%
+that the hat.png texture
+ 
+
+00:03:34.400 --> 00:03:36.630 align:start position:0%
+that the hat.png texture
+was<00:03:34.640><c> incompatible</c><00:03:35.440><c> with</c><00:03:35.599><c> our</c><00:03:35.760><c> list</c><00:03:36.000><c> of</c><00:03:36.159><c> valid</c>
+
+00:03:36.630 --> 00:03:36.640 align:start position:0%
+was incompatible with our list of valid
+ 
+
+00:03:36.640 --> 00:03:38.550 align:start position:0%
+was incompatible with our list of valid
+image<00:03:36.879><c> dimensions</c>
+
+00:03:38.550 --> 00:03:38.560 align:start position:0%
+image dimensions
+ 
+
+00:03:38.560 --> 00:03:40.789 align:start position:0%
+image dimensions
+the<00:03:38.720><c> filename</c><00:03:39.280><c> of</c><00:03:39.360><c> this</c><00:03:39.599><c> texture</c><00:03:40.159><c> reveals</c>
+
+00:03:40.789 --> 00:03:40.799 align:start position:0%
+the filename of this texture reveals
+ 
+
+00:03:40.799 --> 00:03:43.030 align:start position:0%
+the filename of this texture reveals
+where<00:03:41.120><c> in</c><00:03:41.280><c> the</c><00:03:41.360><c> scene</c><00:03:41.680><c> it</c><00:03:41.840><c> is</c><00:03:42.000><c> being</c><00:03:42.319><c> used</c>
+
+00:03:43.030 --> 00:03:43.040 align:start position:0%
+where in the scene it is being used
+ 
+
+00:03:43.040 --> 00:03:46.390 align:start position:0%
+where in the scene it is being used
+namely<00:03:43.440><c> on</c><00:03:43.599><c> the</c><00:03:43.680><c> hat</c><00:03:44.000><c> node</c><00:03:45.280><c> however</c><00:03:46.000><c> you</c><00:03:46.159><c> can</c>
+
+00:03:46.390 --> 00:03:46.400 align:start position:0%
+namely on the hat node however you can
+ 
+
+00:03:46.400 --> 00:03:46.869 align:start position:0%
+namely on the hat node however you can
+imagine
+
+00:03:46.869 --> 00:03:46.879 align:start position:0%
+imagine
+ 
+
+00:03:46.879 --> 00:03:48.949 align:start position:0%
+imagine
+a<00:03:46.959><c> more</c><00:03:47.200><c> complex</c><00:03:47.760><c> scene</c><00:03:48.159><c> including</c><00:03:48.640><c> many</c>
+
+00:03:48.949 --> 00:03:48.959 align:start position:0%
+a more complex scene including many
+ 
+
+00:03:48.959 --> 00:03:51.270 align:start position:0%
+a more complex scene including many
+textures<00:03:49.519><c> whose</c><00:03:49.840><c> file</c><00:03:50.080><c> names</c><00:03:50.480><c> do</c><00:03:50.640><c> not</c><00:03:50.879><c> follow</c>
+
+00:03:51.270 --> 00:03:51.280 align:start position:0%
+textures whose file names do not follow
+ 
+
+00:03:51.280 --> 00:03:54.070 align:start position:0%
+textures whose file names do not follow
+an<00:03:51.519><c> obvious</c><00:03:51.920><c> naming</c><00:03:52.239><c> pattern</c>
+
+00:03:54.070 --> 00:03:54.080 align:start position:0%
+an obvious naming pattern
+ 
+
+00:03:54.080 --> 00:03:56.550 align:start position:0%
+an obvious naming pattern
+in<00:03:54.239><c> such</c><00:03:54.480><c> a</c><00:03:54.560><c> case</c><00:03:55.040><c> it</c><00:03:55.200><c> may</c><00:03:55.360><c> be</c><00:03:55.599><c> very</c><00:03:55.920><c> tedious</c><00:03:56.400><c> to</c>
+
+00:03:56.550 --> 00:03:56.560 align:start position:0%
+in such a case it may be very tedious to
+ 
+
+00:03:56.560 --> 00:03:59.030 align:start position:0%
+in such a case it may be very tedious to
+manually<00:03:57.120><c> identify</c><00:03:57.760><c> which</c><00:03:58.080><c> texture</c><00:03:58.640><c> is</c><00:03:58.799><c> being</c>
+
+00:03:59.030 --> 00:03:59.040 align:start position:0%
+manually identify which texture is being
+ 
+
+00:03:59.040 --> 00:04:01.190 align:start position:0%
+manually identify which texture is being
+used<00:03:59.360><c> by</c><00:03:59.599><c> which</c><00:03:59.920><c> node</c>
+
+00:04:01.190 --> 00:04:01.200 align:start position:0%
+used by which node
+ 
+
+00:04:01.200 --> 00:04:03.830 align:start position:0%
+used by which node
+to<00:04:01.439><c> automate</c><00:04:01.840><c> this</c><00:04:02.080><c> task</c><00:04:02.480><c> in</c><00:04:02.640><c> our</c><00:04:02.720><c> python</c><00:04:03.200><c> fbx</c>
+
+00:04:03.830 --> 00:04:03.840 align:start position:0%
+to automate this task in our python fbx
+ 
+
+00:04:03.840 --> 00:04:04.550 align:start position:0%
+to automate this task in our python fbx
+program
+
+00:04:04.550 --> 00:04:04.560 align:start position:0%
+program
+ 
+
+00:04:04.560 --> 00:04:06.710 align:start position:0%
+program
+the<00:04:04.799><c> idea</c><00:04:05.120><c> is</c><00:04:05.280><c> to</c><00:04:05.439><c> start</c><00:04:05.680><c> at</c><00:04:05.760><c> the</c><00:04:05.920><c> root</c><00:04:06.159><c> node</c>
+
+00:04:06.710 --> 00:04:06.720 align:start position:0%
+the idea is to start at the root node
+ 
+
+00:04:06.720 --> 00:04:08.789 align:start position:0%
+the idea is to start at the root node
+and<00:04:06.879><c> to</c><00:04:07.120><c> inspect</c><00:04:07.599><c> each</c><00:04:07.840><c> node</c><00:04:08.159><c> in</c><00:04:08.319><c> the</c><00:04:08.480><c> scene's</c>
+
+00:04:08.789 --> 00:04:08.799 align:start position:0%
+and to inspect each node in the scene's
+ 
+
+00:04:08.799 --> 00:04:11.110 align:start position:0%
+and to inspect each node in the scene's
+parent<00:04:09.120><c> child</c><00:04:09.519><c> hierarchy</c>
+
+00:04:11.110 --> 00:04:11.120 align:start position:0%
+parent child hierarchy
+ 
+
+00:04:11.120 --> 00:04:13.030 align:start position:0%
+parent child hierarchy
+for<00:04:11.360><c> each</c><00:04:11.680><c> node</c><00:04:12.000><c> we'll</c><00:04:12.239><c> check</c><00:04:12.480><c> whether</c><00:04:12.799><c> or</c><00:04:12.799><c> not</c>
+
+00:04:13.030 --> 00:04:13.040 align:start position:0%
+for each node we'll check whether or not
+ 
+
+00:04:13.040 --> 00:04:14.550 align:start position:0%
+for each node we'll check whether or not
+one<00:04:13.200><c> of</c><00:04:13.280><c> the</c><00:04:13.360><c> materials</c><00:04:13.920><c> properties</c>
+
+00:04:14.550 --> 00:04:14.560 align:start position:0%
+one of the materials properties
+ 
+
+00:04:14.560 --> 00:04:16.310 align:start position:0%
+one of the materials properties
+is<00:04:14.720><c> connected</c><00:04:15.280><c> to</c><00:04:15.439><c> one</c><00:04:15.680><c> of</c><00:04:15.760><c> the</c><00:04:15.920><c> invalid</c>
+
+00:04:16.310 --> 00:04:16.320 align:start position:0%
+is connected to one of the invalid
+ 
+
+00:04:16.320 --> 00:04:18.310 align:start position:0%
+is connected to one of the invalid
+textures
+
+00:04:18.310 --> 00:04:18.320 align:start position:0%
+textures
+ 
+
+00:04:18.320 --> 00:04:20.150 align:start position:0%
+textures
+if<00:04:18.479><c> it</c><00:04:18.639><c> is</c><00:04:18.959><c> we'll</c><00:04:19.199><c> print</c><00:04:19.440><c> the</c><00:04:19.519><c> path</c><00:04:19.840><c> of</c><00:04:19.919><c> that</c>
+
+00:04:20.150 --> 00:04:20.160 align:start position:0%
+if it is we'll print the path of that
+ 
+
+00:04:20.160 --> 00:04:23.590 align:start position:0%
+if it is we'll print the path of that
+node<00:04:20.479><c> in</c><00:04:20.639><c> the</c><00:04:20.720><c> hierarchy</c>
+
+00:04:23.590 --> 00:04:23.600 align:start position:0%
+ 
+ 
+
+00:04:23.600 --> 00:04:26.230 align:start position:0%
+ 
+to<00:04:23.759><c> start</c><00:04:24.320><c> create</c><00:04:24.639><c> a</c><00:04:24.800><c> function</c><00:04:25.440><c> called</c><00:04:25.919><c> find</c>
+
+00:04:26.230 --> 00:04:26.240 align:start position:0%
+to start create a function called find
+ 
+
+00:04:26.240 --> 00:04:27.590 align:start position:0%
+to start create a function called find
+textures<00:04:26.880><c> on</c><00:04:27.040><c> nodes</c>
+
+00:04:27.590 --> 00:04:27.600 align:start position:0%
+textures on nodes
+ 
+
+00:04:27.600 --> 00:04:29.990 align:start position:0%
+textures on nodes
+which<00:04:27.840><c> accepts</c><00:04:28.400><c> a</c><00:04:28.479><c> node</c><00:04:29.120><c> a</c><00:04:29.280><c> dictionary</c><00:04:29.840><c> of</c>
+
+00:04:29.990 --> 00:04:30.000 align:start position:0%
+which accepts a node a dictionary of
+ 
+
+00:04:30.000 --> 00:04:30.950 align:start position:0%
+which accepts a node a dictionary of
+textures
+
+00:04:30.950 --> 00:04:30.960 align:start position:0%
+textures
+ 
+
+00:04:30.960 --> 00:04:34.070 align:start position:0%
+textures
+and<00:04:31.199><c> a</c><00:04:31.280><c> current</c><00:04:31.600><c> path</c><00:04:31.919><c> list</c><00:04:33.440><c> we'll</c><00:04:33.680><c> use</c><00:04:33.840><c> this</c>
+
+00:04:34.070 --> 00:04:34.080 align:start position:0%
+and a current path list we'll use this
+ 
+
+00:04:34.080 --> 00:04:34.469 align:start position:0%
+and a current path list we'll use this
+list
+
+00:04:34.469 --> 00:04:34.479 align:start position:0%
+list
+ 
+
+00:04:34.479 --> 00:04:36.550 align:start position:0%
+list
+to<00:04:34.639><c> keep</c><00:04:34.880><c> track</c><00:04:35.199><c> of</c><00:04:35.360><c> the</c><00:04:35.440><c> current</c><00:04:35.840><c> node</c><00:04:36.080><c> path</c>
+
+00:04:36.550 --> 00:04:36.560 align:start position:0%
+to keep track of the current node path
+ 
+
+00:04:36.560 --> 00:04:38.469 align:start position:0%
+to keep track of the current node path
+in<00:04:36.639><c> the</c><00:04:36.800><c> scene</c><00:04:37.120><c> graph</c>
+
+00:04:38.469 --> 00:04:38.479 align:start position:0%
+in the scene graph
+ 
+
+00:04:38.479 --> 00:04:40.390 align:start position:0%
+in the scene graph
+we'll<00:04:38.720><c> be</c><00:04:38.880><c> building</c><00:04:39.199><c> this</c><00:04:39.440><c> function</c><00:04:39.919><c> in</c><00:04:40.080><c> small</c>
+
+00:04:40.390 --> 00:04:40.400 align:start position:0%
+we'll be building this function in small
+ 
+
+00:04:40.400 --> 00:04:41.990 align:start position:0%
+we'll be building this function in small
+increments<00:04:41.120><c> so</c><00:04:41.280><c> let's</c><00:04:41.600><c> start</c><00:04:41.759><c> by</c>
+
+00:04:41.990 --> 00:04:42.000 align:start position:0%
+increments so let's start by
+ 
+
+00:04:42.000 --> 00:04:43.830 align:start position:0%
+increments so let's start by
+printing<00:04:42.400><c> the</c><00:04:42.560><c> current</c><00:04:42.880><c> path</c><00:04:43.280><c> of</c><00:04:43.360><c> the</c><00:04:43.520><c> nodes</c>
+
+00:04:43.830 --> 00:04:43.840 align:start position:0%
+printing the current path of the nodes
+ 
+
+00:04:43.840 --> 00:04:46.150 align:start position:0%
+printing the current path of the nodes
+we've<00:04:44.160><c> visited</c>
+
+00:04:46.150 --> 00:04:46.160 align:start position:0%
+we've visited
+ 
+
+00:04:46.160 --> 00:04:47.830 align:start position:0%
+we've visited
+append<00:04:46.479><c> the</c><00:04:46.560><c> node's</c><00:04:46.960><c> name</c><00:04:47.199><c> to</c><00:04:47.360><c> the</c><00:04:47.520><c> current</c>
+
+00:04:47.830 --> 00:04:47.840 align:start position:0%
+append the node's name to the current
+ 
+
+00:04:47.840 --> 00:04:49.909 align:start position:0%
+append the node's name to the current
+path
+
+00:04:49.909 --> 00:04:49.919 align:start position:0%
+path
+ 
+
+00:04:49.919 --> 00:04:54.469 align:start position:0%
+path
+and<00:04:50.160><c> print</c><00:04:50.400><c> that</c><00:04:50.639><c> path</c>
+
+00:04:54.469 --> 00:04:54.479 align:start position:0%
+ 
+ 
+
+00:04:54.479 --> 00:04:56.870 align:start position:0%
+ 
+use<00:04:54.800><c> a</c><00:04:54.880><c> for</c><00:04:55.120><c> loop</c><00:04:55.440><c> to</c><00:04:55.600><c> access</c><00:04:56.080><c> the</c><00:04:56.160><c> children</c><00:04:56.720><c> of</c>
+
+00:04:56.870 --> 00:04:56.880 align:start position:0%
+use a for loop to access the children of
+ 
+
+00:04:56.880 --> 00:04:59.030 align:start position:0%
+use a for loop to access the children of
+the<00:04:56.960><c> current</c><00:04:57.360><c> node</c>
+
+00:04:59.030 --> 00:04:59.040 align:start position:0%
+the current node
+ 
+
+00:04:59.040 --> 00:05:01.990 align:start position:0%
+the current node
+here<00:05:00.360><c> node.getchildcount</c><00:05:01.440><c> returns</c><00:05:01.919><c> the</c>
+
+00:05:01.990 --> 00:05:02.000 align:start position:0%
+here node.getchildcount returns the
+ 
+
+00:05:02.000 --> 00:05:02.950 align:start position:0%
+here node.getchildcount returns the
+number<00:05:02.240><c> of</c><00:05:02.400><c> children</c>
+
+00:05:02.950 --> 00:05:02.960 align:start position:0%
+number of children
+ 
+
+00:05:02.960 --> 00:05:06.870 align:start position:0%
+number of children
+of<00:05:03.120><c> the</c><00:05:03.280><c> current</c><00:05:03.600><c> node</c><00:05:05.720><c> node.getchildi</c>
+
+00:05:06.870 --> 00:05:06.880 align:start position:0%
+of the current node node.getchildi
+ 
+
+00:05:06.880 --> 00:05:10.469 align:start position:0%
+of the current node node.getchildi
+returns<00:05:07.360><c> the</c><00:05:07.440><c> node's</c><00:05:07.840><c> child</c><00:05:08.400><c> index</c><00:05:08.880><c> at</c><00:05:09.120><c> i</c>
+
+00:05:10.469 --> 00:05:10.479 align:start position:0%
+returns the node's child index at i
+ 
+
+00:05:10.479 --> 00:05:12.749 align:start position:0%
+returns the node's child index at i
+outside<00:05:10.960><c> the</c><00:05:11.120><c> for</c><00:05:11.360><c> loop</c><00:05:11.840><c> call</c>
+
+00:05:12.749 --> 00:05:12.759 align:start position:0%
+outside the for loop call
+ 
+
+00:05:12.759 --> 00:05:14.870 align:start position:0%
+outside the for loop call
+currentpath.pop<00:05:13.840><c> to</c><00:05:14.000><c> remove</c><00:05:14.400><c> the</c><00:05:14.560><c> last</c>
+
+00:05:14.870 --> 00:05:14.880 align:start position:0%
+currentpath.pop to remove the last
+ 
+
+00:05:14.880 --> 00:05:15.350 align:start position:0%
+currentpath.pop to remove the last
+element
+
+00:05:15.350 --> 00:05:15.360 align:start position:0%
+element
+ 
+
+00:05:15.360 --> 00:05:18.390 align:start position:0%
+element
+of<00:05:15.440><c> the</c><00:05:15.600><c> current</c><00:05:15.919><c> path</c><00:05:16.240><c> list</c><00:05:17.840><c> the</c><00:05:18.000><c> paired</c>
+
+00:05:18.390 --> 00:05:18.400 align:start position:0%
+of the current path list the paired
+ 
+
+00:05:18.400 --> 00:05:20.230 align:start position:0%
+of the current path list the paired
+calls<00:05:18.720><c> to</c><00:05:19.039><c> append</c><00:05:19.600><c> and</c><00:05:19.840><c> pop</c>
+
+00:05:20.230 --> 00:05:20.240 align:start position:0%
+calls to append and pop
+ 
+
+00:05:20.240 --> 00:05:22.150 align:start position:0%
+calls to append and pop
+ensure<00:05:20.639><c> the</c><00:05:20.800><c> current</c><00:05:21.120><c> path</c><00:05:21.520><c> contains</c><00:05:22.000><c> the</c>
+
+00:05:22.150 --> 00:05:22.160 align:start position:0%
+ensure the current path contains the
+ 
+
+00:05:22.160 --> 00:05:23.270 align:start position:0%
+ensure the current path contains the
+correct<00:05:22.479><c> node</c><00:05:22.800><c> names</c>
+
+00:05:23.270 --> 00:05:23.280 align:start position:0%
+correct node names
+ 
+
+00:05:23.280 --> 00:05:26.469 align:start position:0%
+correct node names
+for<00:05:23.440><c> the</c><00:05:23.600><c> given</c><00:05:23.919><c> depth</c><00:05:24.240><c> in</c><00:05:24.400><c> the</c><00:05:24.479><c> scene</c><00:05:24.800><c> graph</c>
+
+00:05:26.469 --> 00:05:26.479 align:start position:0%
+for the given depth in the scene graph
+ 
+
+00:05:26.479 --> 00:05:29.189 align:start position:0%
+for the given depth in the scene graph
+outside<00:05:26.880><c> the</c><00:05:27.039><c> function</c><00:05:27.759><c> call</c><00:05:28.240><c> find</c><00:05:28.560><c> textures</c>
+
+00:05:29.189 --> 00:05:29.199 align:start position:0%
+outside the function call find textures
+ 
+
+00:05:29.199 --> 00:05:29.909 align:start position:0%
+outside the function call find textures
+on<00:05:29.360><c> nodes</c>
+
+00:05:29.909 --> 00:05:29.919 align:start position:0%
+on nodes
+ 
+
+00:05:29.919 --> 00:05:31.590 align:start position:0%
+on nodes
+using<00:05:30.160><c> the</c><00:05:30.320><c> scene's</c><00:05:30.639><c> root</c><00:05:30.880><c> node</c><00:05:31.360><c> and</c><00:05:31.440><c> the</c>
+
+00:05:31.590 --> 00:05:31.600 align:start position:0%
+using the scene's root node and the
+ 
+
+00:05:31.600 --> 00:05:33.670 align:start position:0%
+using the scene's root node and the
+dictionary<00:05:32.240><c> of</c><00:05:32.479><c> invalid</c><00:05:32.960><c> textures</c><00:05:33.440><c> we</c>
+
+00:05:33.670 --> 00:05:33.680 align:start position:0%
+dictionary of invalid textures we
+ 
+
+00:05:33.680 --> 00:05:35.990 align:start position:0%
+dictionary of invalid textures we
+created<00:05:34.160><c> in</c><00:05:34.400><c> part</c><00:05:34.639><c> 1.</c>
+
+00:05:35.990 --> 00:05:36.000 align:start position:0%
+created in part 1.
+ 
+
+00:05:36.000 --> 00:05:38.230 align:start position:0%
+created in part 1.
+when<00:05:36.160><c> we</c><00:05:36.320><c> run</c><00:05:36.479><c> the</c><00:05:36.639><c> program</c><00:05:37.360><c> the</c><00:05:37.520><c> path</c><00:05:37.759><c> of</c><00:05:37.919><c> each</c>
+
+00:05:38.230 --> 00:05:38.240 align:start position:0%
+when we run the program the path of each
+ 
+
+00:05:38.240 --> 00:05:39.189 align:start position:0%
+when we run the program the path of each
+node<00:05:38.560><c> in</c><00:05:38.639><c> the</c><00:05:38.800><c> scene</c>
+
+00:05:39.189 --> 00:05:39.199 align:start position:0%
+node in the scene
+ 
+
+00:05:39.199 --> 00:05:45.590 align:start position:0%
+node in the scene
+is<00:05:39.360><c> printed</c><00:05:39.759><c> to</c><00:05:39.919><c> the</c><00:05:40.000><c> console</c>
+
+00:05:45.590 --> 00:05:45.600 align:start position:0%
+ 
+ 
+
+00:05:45.600 --> 00:05:47.909 align:start position:0%
+ 
+next<00:05:46.160><c> create</c><00:05:46.479><c> a</c><00:05:46.560><c> for</c><00:05:46.800><c> loop</c><00:05:47.120><c> to</c><00:05:47.280><c> iterate</c><00:05:47.759><c> over</c>
+
+00:05:47.909 --> 00:05:47.919 align:start position:0%
+next create a for loop to iterate over
+ 
+
+00:05:47.919 --> 00:05:50.550 align:start position:0%
+next create a for loop to iterate over
+the<00:05:48.080><c> node's</c><00:05:48.400><c> materials</c>
+
+00:05:50.550 --> 00:05:50.560 align:start position:0%
+the node's materials
+ 
+
+00:05:50.560 --> 00:05:52.469 align:start position:0%
+the node's materials
+print<00:05:50.800><c> the</c><00:05:50.880><c> material's</c><00:05:51.440><c> name</c><00:05:51.840><c> to</c><00:05:52.000><c> see</c><00:05:52.240><c> which</c>
+
+00:05:52.469 --> 00:05:52.479 align:start position:0%
+print the material's name to see which
+ 
+
+00:05:52.479 --> 00:05:55.590 align:start position:0%
+print the material's name to see which
+materials<00:05:53.120><c> are</c><00:05:53.280><c> bound</c><00:05:53.520><c> to</c><00:05:53.759><c> each</c><00:05:54.000><c> node</c>
+
+00:05:55.590 --> 00:05:55.600 align:start position:0%
+materials are bound to each node
+ 
+
+00:05:55.600 --> 00:05:58.790 align:start position:0%
+materials are bound to each node
+run<00:05:55.759><c> the</c><00:05:55.919><c> program</c><00:05:57.919><c> in</c><00:05:58.000><c> the</c><00:05:58.160><c> output</c>
+
+00:05:58.790 --> 00:05:58.800 align:start position:0%
+run the program in the output
+ 
+
+00:05:58.800 --> 00:06:00.950 align:start position:0%
+run the program in the output
+we<00:05:58.960><c> can</c><00:05:59.199><c> see</c><00:05:59.360><c> that</c><00:05:59.520><c> the</c><00:05:59.680><c> character's</c><00:06:00.240><c> chest</c>
+
+00:06:00.950 --> 00:06:00.960 align:start position:0%
+we can see that the character's chest
+ 
+
+00:06:00.960 --> 00:06:03.670 align:start position:0%
+we can see that the character's chest
+head<00:06:01.600><c> arms</c><00:06:02.080><c> and</c><00:06:02.319><c> legs</c><00:06:02.720><c> have</c><00:06:02.960><c> the</c><00:06:03.039><c> same</c><00:06:03.360><c> cube</c>
+
+00:06:03.670 --> 00:06:03.680 align:start position:0%
+head arms and legs have the same cube
+ 
+
+00:06:03.680 --> 00:06:05.029 align:start position:0%
+head arms and legs have the same cube
+band<00:06:03.919><c> mat</c><00:06:04.160><c> material</c>
+
+00:06:05.029 --> 00:06:05.039 align:start position:0%
+band mat material
+ 
+
+00:06:05.039 --> 00:06:06.870 align:start position:0%
+band mat material
+while<00:06:05.199><c> the</c><00:06:05.360><c> hat</c><00:06:05.600><c> node</c><00:06:05.919><c> contains</c><00:06:06.400><c> the</c><00:06:06.560><c> hat</c>
+
+00:06:06.870 --> 00:06:06.880 align:start position:0%
+while the hat node contains the hat
+ 
+
+00:06:06.880 --> 00:06:08.870 align:start position:0%
+while the hat node contains the hat
+matte<00:06:07.199><c> material</c>
+
+00:06:08.870 --> 00:06:08.880 align:start position:0%
+matte material
+ 
+
+00:06:08.880 --> 00:06:11.110 align:start position:0%
+matte material
+to<00:06:09.120><c> access</c><00:06:09.520><c> a</c><00:06:09.600><c> material's</c><00:06:10.160><c> properties</c><00:06:10.960><c> use</c>
+
+00:06:11.110 --> 00:06:11.120 align:start position:0%
+to access a material's properties use
+ 
+
+00:06:11.120 --> 00:06:13.510 align:start position:0%
+to access a material's properties use
+the<00:06:11.280><c> following</c><00:06:11.759><c> for</c><00:06:12.000><c> loop</c>
+
+00:06:13.510 --> 00:06:13.520 align:start position:0%
+the following for loop
+ 
+
+00:06:13.520 --> 00:06:16.550 align:start position:0%
+the following for loop
+fbx<00:06:14.240><c> dot</c><00:06:14.560><c> fbx</c><00:06:15.199><c> layer</c><00:06:15.520><c> element</c><00:06:16.240><c> dot</c>
+
+00:06:16.550 --> 00:06:16.560 align:start position:0%
+fbx dot fbx layer element dot
+ 
+
+00:06:16.560 --> 00:06:19.029 align:start position:0%
+fbx dot fbx layer element dot
+s-type<00:06:17.199><c> texture</c><00:06:17.680><c> count</c><00:06:18.240><c> provides</c><00:06:18.639><c> the</c><00:06:18.800><c> number</c>
+
+00:06:19.029 --> 00:06:19.039 align:start position:0%
+s-type texture count provides the number
+ 
+
+00:06:19.039 --> 00:06:19.990 align:start position:0%
+s-type texture count provides the number
+of<00:06:19.199><c> texture-based</c>
+
+00:06:19.990 --> 00:06:20.000 align:start position:0%
+of texture-based
+ 
+
+00:06:20.000 --> 00:06:23.150 align:start position:0%
+of texture-based
+properties<00:06:20.560><c> on</c><00:06:20.720><c> materials</c><00:06:22.560><c> call</c>
+
+00:06:23.150 --> 00:06:23.160 align:start position:0%
+properties on materials call
+ 
+
+00:06:23.160 --> 00:06:25.110 align:start position:0%
+properties on materials call
+material.find<00:06:24.160><c> property</c><00:06:24.720><c> with</c><00:06:24.960><c> the</c>
+
+00:06:25.110 --> 00:06:25.120 align:start position:0%
+material.find property with the
+ 
+
+00:06:25.120 --> 00:06:26.230 align:start position:0%
+material.find property with the
+following<00:06:25.520><c> parameter</c>
+
+00:06:26.230 --> 00:06:26.240 align:start position:0%
+following parameter
+ 
+
+00:06:26.240 --> 00:06:28.230 align:start position:0%
+following parameter
+to<00:06:26.479><c> access</c><00:06:26.880><c> the</c><00:06:27.039><c> material's</c><00:06:27.600><c> texture-based</c>
+
+00:06:28.230 --> 00:06:28.240 align:start position:0%
+to access the material's texture-based
+ 
+
+00:06:28.240 --> 00:06:32.870 align:start position:0%
+to access the material's texture-based
+property<00:06:28.880><c> with</c><00:06:29.039><c> the</c><00:06:29.199><c> given</c><00:06:29.520><c> property</c><00:06:30.000><c> index</c>
+
+00:06:32.870 --> 00:06:32.880 align:start position:0%
+ 
+ 
+
+00:06:32.880 --> 00:06:35.189 align:start position:0%
+ 
+some<00:06:33.120><c> material</c><00:06:33.680><c> properties</c><00:06:34.240><c> are</c><00:06:34.319><c> nameless</c><00:06:34.960><c> so</c>
+
+00:06:35.189 --> 00:06:35.199 align:start position:0%
+some material properties are nameless so
+ 
+
+00:06:35.199 --> 00:06:37.189 align:start position:0%
+some material properties are nameless so
+we'll<00:06:35.360><c> filter</c><00:06:35.759><c> those</c><00:06:36.080><c> out</c><00:06:36.240><c> with</c><00:06:36.479><c> a</c><00:06:36.560><c> simple</c><00:06:36.960><c> if</c>
+
+00:06:37.189 --> 00:06:37.199 align:start position:0%
+we'll filter those out with a simple if
+ 
+
+00:06:37.199 --> 00:06:37.990 align:start position:0%
+we'll filter those out with a simple if
+statement
+
+00:06:37.990 --> 00:06:38.000 align:start position:0%
+statement
+ 
+
+00:06:38.000 --> 00:06:39.510 align:start position:0%
+statement
+and<00:06:38.240><c> print</c><00:06:38.479><c> the</c><00:06:38.560><c> names</c><00:06:38.880><c> of</c><00:06:38.960><c> the</c><00:06:39.120><c> remaining</c>
+
+00:06:39.510 --> 00:06:39.520 align:start position:0%
+and print the names of the remaining
+ 
+
+00:06:39.520 --> 00:06:41.350 align:start position:0%
+and print the names of the remaining
+properties
+
+00:06:41.350 --> 00:06:41.360 align:start position:0%
+properties
+ 
+
+00:06:41.360 --> 00:06:43.350 align:start position:0%
+properties
+running<00:06:41.680><c> the</c><00:06:41.840><c> program</c><00:06:42.479><c> now</c><00:06:42.720><c> outputs</c><00:06:43.199><c> the</c>
+
+00:06:43.350 --> 00:06:43.360 align:start position:0%
+running the program now outputs the
+ 
+
+00:06:43.360 --> 00:06:47.430 align:start position:0%
+running the program now outputs the
+properties<00:06:43.919><c> of</c><00:06:44.080><c> each</c><00:06:44.319><c> material</c>
+
+00:06:47.430 --> 00:06:47.440 align:start position:0%
+ 
+ 
+
+00:06:47.440 --> 00:06:49.510 align:start position:0%
+ 
+to<00:06:47.600><c> iterate</c><00:06:48.080><c> over</c><00:06:48.319><c> the</c><00:06:48.479><c> textures</c><00:06:49.120><c> connected</c>
+
+00:06:49.510 --> 00:06:49.520 align:start position:0%
+to iterate over the textures connected
+ 
+
+00:06:49.520 --> 00:06:50.629 align:start position:0%
+to iterate over the textures connected
+to<00:06:49.680><c> a</c><00:06:49.840><c> property</c>
+
+00:06:50.629 --> 00:06:50.639 align:start position:0%
+to a property
+ 
+
+00:06:50.639 --> 00:06:53.670 align:start position:0%
+to a property
+use<00:06:50.880><c> the</c><00:06:51.039><c> following</c><00:06:51.520><c> for</c><00:06:51.759><c> loop</c><00:06:52.960><c> the</c><00:06:53.120><c> connected</c>
+
+00:06:53.670 --> 00:06:53.680 align:start position:0%
+use the following for loop the connected
+ 
+
+00:06:53.680 --> 00:06:54.309 align:start position:0%
+use the following for loop the connected
+texture
+
+00:06:54.309 --> 00:06:54.319 align:start position:0%
+texture
+ 
+
+00:06:54.319 --> 00:06:56.270 align:start position:0%
+texture
+is<00:06:54.479><c> obtained</c><00:06:54.800><c> with</c><00:06:55.039><c> a</c><00:06:55.120><c> call</c><00:06:55.360><c> to</c>
+
+00:06:56.270 --> 00:06:56.280 align:start position:0%
+is obtained with a call to
+ 
+
+00:06:56.280 --> 00:06:57.430 align:start position:0%
+is obtained with a call to
+property.getsrc
+
+00:06:57.430 --> 00:06:57.440 align:start position:0%
+property.getsrc
+ 
+
+00:06:57.440 --> 00:07:00.390 align:start position:0%
+property.getsrc
+object<00:06:58.080><c> using</c><00:06:58.400><c> the</c><00:06:58.639><c> fbx</c><00:06:59.199><c> file</c><00:06:59.520><c> texture</c><00:07:00.000><c> class</c>
+
+00:07:00.390 --> 00:07:00.400 align:start position:0%
+object using the fbx file texture class
+ 
+
+00:07:00.400 --> 00:07:00.950 align:start position:0%
+object using the fbx file texture class
+id
+
+00:07:00.950 --> 00:07:00.960 align:start position:0%
+id
+ 
+
+00:07:00.960 --> 00:07:04.070 align:start position:0%
+id
+and<00:07:01.120><c> the</c><00:07:01.199><c> current</c><00:07:01.520><c> texture</c><00:07:02.000><c> index</c><00:07:03.759><c> print</c><00:07:04.000><c> the</c>
+
+00:07:04.070 --> 00:07:04.080 align:start position:0%
+and the current texture index print the
+ 
+
+00:07:04.080 --> 00:07:05.270 align:start position:0%
+and the current texture index print the
+texture's<00:07:04.639><c> filename</c>
+
+00:07:05.270 --> 00:07:05.280 align:start position:0%
+texture's filename
+ 
+
+00:07:05.280 --> 00:07:08.390 align:start position:0%
+texture's filename
+with<00:07:06.280><c> texture.getfilename</c>
+
+00:07:08.390 --> 00:07:08.400 align:start position:0%
+with texture.getfilename
+ 
+
+00:07:08.400 --> 00:07:10.309 align:start position:0%
+with texture.getfilename
+when<00:07:08.560><c> we</c><00:07:08.720><c> run</c><00:07:08.880><c> the</c><00:07:09.039><c> program</c><00:07:09.680><c> we</c><00:07:09.840><c> can</c><00:07:10.000><c> see</c><00:07:10.160><c> that</c>
+
+00:07:10.309 --> 00:07:10.319 align:start position:0%
+when we run the program we can see that
+ 
+
+00:07:10.319 --> 00:07:12.309 align:start position:0%
+when we run the program we can see that
+the<00:07:10.479><c> textures</c><00:07:11.039><c> are</c><00:07:11.199><c> only</c><00:07:11.440><c> connected</c><00:07:12.000><c> to</c><00:07:12.160><c> the</c>
+
+00:07:12.309 --> 00:07:12.319 align:start position:0%
+the textures are only connected to the
+ 
+
+00:07:12.319 --> 00:07:15.430 align:start position:0%
+the textures are only connected to the
+diffuse<00:07:12.800><c> color</c><00:07:13.120><c> property</c>
+
+00:07:15.430 --> 00:07:15.440 align:start position:0%
+diffuse color property
+ 
+
+00:07:15.440 --> 00:07:17.589 align:start position:0%
+diffuse color property
+the<00:07:15.599><c> next</c><00:07:15.840><c> step</c><00:07:16.240><c> is</c><00:07:16.319><c> to</c><00:07:16.479><c> identify</c><00:07:16.960><c> the</c><00:07:17.120><c> paths</c>
+
+00:07:17.589 --> 00:07:17.599 align:start position:0%
+the next step is to identify the paths
+ 
+
+00:07:17.599 --> 00:07:19.909 align:start position:0%
+the next step is to identify the paths
+of<00:07:17.680><c> the</c><00:07:17.840><c> invalid</c><00:07:18.240><c> textures</c>
+
+00:07:19.909 --> 00:07:19.919 align:start position:0%
+of the invalid textures
+ 
+
+00:07:19.919 --> 00:07:21.430 align:start position:0%
+of the invalid textures
+let's<00:07:20.160><c> get</c><00:07:20.319><c> rid</c><00:07:20.479><c> of</c><00:07:20.639><c> our</c><00:07:20.720><c> previous</c><00:07:21.199><c> print</c>
+
+00:07:21.430 --> 00:07:21.440 align:start position:0%
+let's get rid of our previous print
+ 
+
+00:07:21.440 --> 00:07:23.589 align:start position:0%
+let's get rid of our previous print
+statements<00:07:22.080><c> and</c><00:07:22.319><c> only</c><00:07:22.560><c> print</c><00:07:22.800><c> the</c><00:07:22.960><c> texture's</c>
+
+00:07:23.589 --> 00:07:23.599 align:start position:0%
+statements and only print the texture's
+ 
+
+00:07:23.599 --> 00:07:23.990 align:start position:0%
+statements and only print the texture's
+path
+
+00:07:23.990 --> 00:07:24.000 align:start position:0%
+path
+ 
+
+00:07:24.000 --> 00:07:28.830 align:start position:0%
+path
+if<00:07:24.160><c> its</c><00:07:24.319><c> file</c><00:07:24.560><c> name</c><00:07:24.880><c> is</c><00:07:25.039><c> in</c><00:07:25.120><c> the</c><00:07:25.280><c> texture</c>
+
+00:07:28.830 --> 00:07:28.840 align:start position:0%
+ 
+ 
+
+00:07:28.840 --> 00:07:30.550 align:start position:0%
+ 
+dictionary
+
+00:07:30.550 --> 00:07:30.560 align:start position:0%
+dictionary
+ 
+
+00:07:30.560 --> 00:07:32.629 align:start position:0%
+dictionary
+when<00:07:30.720><c> we</c><00:07:30.880><c> run</c><00:07:31.039><c> the</c><00:07:31.199><c> program</c><00:07:31.680><c> now</c><00:07:32.240><c> the</c><00:07:32.400><c> scene</c>
+
+00:07:32.629 --> 00:07:32.639 align:start position:0%
+when we run the program now the scene
+ 
+
+00:07:32.639 --> 00:07:35.110 align:start position:0%
+when we run the program now the scene
+path<00:07:33.039><c> of</c><00:07:33.120><c> the</c><00:07:33.280><c> invalid</c><00:07:33.759><c> texture</c><00:07:34.240><c> is</c><00:07:34.479><c> printed</c>
+
+00:07:35.110 --> 00:07:35.120 align:start position:0%
+path of the invalid texture is printed
+ 
+
+00:07:35.120 --> 00:07:37.189 align:start position:0%
+path of the invalid texture is printed
+including<00:07:35.599><c> its</c><00:07:35.840><c> material</c><00:07:36.400><c> and</c><00:07:36.560><c> its</c><00:07:36.720><c> connected</c>
+
+00:07:37.189 --> 00:07:37.199 align:start position:0%
+including its material and its connected
+ 
+
+00:07:37.199 --> 00:07:39.270 align:start position:0%
+including its material and its connected
+property
+
+00:07:39.270 --> 00:07:39.280 align:start position:0%
+property
+ 
+
+00:07:39.280 --> 00:07:40.950 align:start position:0%
+property
+you<00:07:39.440><c> should</c><00:07:39.599><c> now</c><00:07:39.759><c> have</c><00:07:40.000><c> a</c><00:07:40.080><c> good</c><00:07:40.240><c> idea</c><00:07:40.720><c> of</c><00:07:40.800><c> how</c>
+
+00:07:40.950 --> 00:07:40.960 align:start position:0%
+you should now have a good idea of how
+ 
+
+00:07:40.960 --> 00:07:42.390 align:start position:0%
+you should now have a good idea of how
+to<00:07:41.120><c> navigate</c><00:07:41.520><c> the</c><00:07:41.680><c> scene</c><00:07:42.000><c> graph</c>
+
+00:07:42.390 --> 00:07:42.400 align:start position:0%
+to navigate the scene graph
+ 
+
+00:07:42.400 --> 00:07:45.350 align:start position:0%
+to navigate the scene graph
+using<00:07:42.639><c> the</c><00:07:42.800><c> python</c><00:07:43.360><c> fbx</c><00:07:44.000><c> sdk</c><00:07:44.879><c> and</c><00:07:45.039><c> how</c><00:07:45.199><c> to</c>
+
+00:07:45.350 --> 00:07:45.360 align:start position:0%
+using the python fbx sdk and how to
+ 
+
+00:07:45.360 --> 00:07:56.830 align:start position:0%
+using the python fbx sdk and how to
+access<00:07:45.759><c> a</c><00:07:45.840><c> node's</c><00:07:46.160><c> material</c><00:07:46.720><c> and</c><00:07:46.879><c> texture</c>
+
+00:07:56.830 --> 00:07:56.840 align:start position:0%
+ 
+ 
+
+00:07:56.840 --> 00:08:03.990 align:start position:0%
+ 
+information
+
+00:08:03.990 --> 00:08:04.000 align:start position:0%
+ 
+ 
+
+00:08:04.000 --> 00:08:06.080 align:start position:0%
+ 
+you

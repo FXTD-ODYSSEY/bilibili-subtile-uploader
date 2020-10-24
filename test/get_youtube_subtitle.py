@@ -4,7 +4,7 @@ import json
 import re
 import requests
 
-url = "https://www.youtube.com/watch?v=iMTvTh5J5Og"
+url = "https://www.youtube.com/watch?v=r2PJpoHNzh4"
 
 payload = {}
 headers = {
@@ -24,19 +24,22 @@ response = requests.request("GET", url, headers=headers, data = payload)
 html = response.text
 # print(html)
 
+# with open('test.html','w') as f:
+#     f.write(html)
+
 
 pattern = re.escape(r'"captionTracks":[{"baseUrl":')
 regx = re.search(f'{pattern}"(.*?)"',html)
 if regx:
     url = regx.group(1)
-    url_line = []
-    for param in url.split(r'\u0026'):
-    # #     if param.startswith('lang'):
-    # #         param = 'lang=zh'
-        url_line.append(param)
-    # url_line.append('fmt=vtt')
     url = url.replace(r'\u0026',"&")
     url += "&fmt=vtt"
-    # print(url)
+    # url += "&tlang=zh-Hans"
     vtt = requests.request("GET", url)
-    print(vtt.text)
+    # # NOTE 清除 youtube vtt 第5行 空行
+    text = vtt.text
+    text = "\n".join([line for i,line in enumerate(text.splitlines()) if i != 5])
+    with open('test.vtt','w',encoding="utf-8") as f:
+        f.write(text)
+else:
+    print("not match")
