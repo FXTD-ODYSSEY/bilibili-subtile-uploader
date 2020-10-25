@@ -328,6 +328,9 @@ logging.basicConfig()
 
 class Constant:
     """A class for storing constants for YoutubeUploader class"""
+    BILIBILI_URL = 'https://www.bilibili.com/'
+    
+    
     YOUTUBE_URL = 'https://www.youtube.com'
     YOUTUBE_STUDIO_URL = 'https://studio.youtube.com'
     YOUTUBE_UPLOAD_URL = 'https://www.youtube.com/upload'
@@ -374,7 +377,7 @@ class YouTubeUploader:
         self.browser = Firefox(current_working_dir, current_working_dir,full_screen=False)
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.DEBUG)
-        self.__validate_inputs()
+        # self.__validate_inputs()
         self.username = ""
         self.password = ""
 
@@ -386,16 +389,74 @@ class YouTubeUploader:
         if not self.metadata_dict[Constant.VIDEO_DESCRIPTION]:
             self.logger.warning("The video description was not found in a metadata file")
 
-    def upload(self):
+    # def upload_bilibili(self):
+    #     try:
+    #         self.bilibili_login()
+    #         return self.youtube_upload()
+    #     except Exception as e:
+    #         print(e)
+    #         self.quit()
+    #         raise
+
+    def bilibili_login(self):
+        self.browser.get(Constant.BILIBILI_URL)
+        time.sleep(Constant.USER_WAITING_TIME)
+
+        if self.browser.has_cookies_for_current_website():
+            self.browser.load_cookies()
+            time.sleep(Constant.USER_WAITING_TIME)
+            self.browser.refresh()
+        else:
+            self.logger.info('Please sign in and then press enter')
+            input()
+            self.browser.get(Constant.BILIBILI_URL)
+            time.sleep(Constant.USER_WAITING_TIME)
+            self.browser.save_cookies()
+
+    
+    def bilibili_upload(self,bvid,cid,bcc_path,zh=False):
+        self.browser.get(f"https://account.bilibili.com/subtitle/edit/#/editor?bvid={bvid}&cid={cid}")
+        time.sleep(Constant.USER_WAITING_TIME)
+        # NOTE 语言点击
+        path = f"//body/div[@id='app']/div[1]/div[1]/div[2]/div[2]/div[2]/div[2]/div[1]/ul[1]/li[{1 if zh else 6}]"
+        self.browser.find(By.XPATH,path).click()
+        time.sleep(Constant.USER_WAITING_TIME)
+        # NOTE 点击编辑按钮
+        path = "//body/div[@id='app']/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[1]/button[1]"
+        self.browser.find(By.XPATH,path).click()
+        # NOTE 上传 input
+        path = "//body/div[@id='app']/div[1]/div[1]/div[2]/div[1]/div[2]/label[1]/input[1]"
+        self.browser.find(By.XPATH,path).send_keys(bcc_path)
+        time.sleep(Constant.USER_WAITING_TIME)
+        
+        # NOTE 点击上传按钮
+        path = "//body/div[@id='app']/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/div[1]/div[2]/button[1]"
+        self.browser.find(By.XPATH,path).click()
+        time.sleep(Constant.USER_WAITING_TIME)
+        # self.browser.get(Constant.BILIBILI_URL)
+        
+        # elem = self.browser.driver.find_elements_by_xpath("//*[contains(text(), '中文')]")
+        # print(elem)
+        # typ = self.browser.find(By.NAME, "中文（中国）" if zh else "英语（美国）") 
+        # self.browser.driver.execute_script("$('.el-select-dropdown__list').children()[0].click()") 
+        # time.sleep(Constant.USER_WAITING_TIME)
+        # self.browser.driver.execute_script("$('button').children()[1].click()") 
+        # time.sleep(Constant.USER_WAITING_TIME)
+
+    
+    def upload_yotube(self):
         try:
-            self.__login()
-            return self.__upload()
+            self.youtube_login()
+            return self.youtube_upload()
         except Exception as e:
             print(e)
             self.quit()
             raise
+        
+    def youtube_login(self,username="",password=""):
+        username = username if username else self.username
+        password = password if password else self.password
 
-    def __login(self):
         self.browser.get(Constant.YOUTUBE_URL)
         time.sleep(Constant.USER_WAITING_TIME)
 
@@ -407,10 +468,10 @@ class YouTubeUploader:
             self.browser.get('https://stackoverflow.com/users/signup?ssrc=head&returnurl=%2fusers%2fstory%2fcurrent%27')
             time.sleep(Constant.USER_WAITING_TIME)
             self.browser.find(By.XPATH,'//*[@id="openid-buttons"]/button[1]').click()
-            self.browser.find(By.XPATH,'//input[@type="email"]').send_keys(self.username)
+            self.browser.find(By.XPATH,'//input[@type="email"]').send_keys(username)
             self.browser.find(By.XPATH,'//*[@id="identifierNext"]').click()
             time.sleep(Constant.USER_WAITING_TIME*2)
-            self.browser.find(By.XPATH,'//input[@type="password"]').send_keys(self.password)
+            self.browser.find(By.XPATH,'//input[@type="password"]').send_keys(password)
             self.browser.find(By.XPATH,'//*[@id="passwordNext"]').click()
             time.sleep(Constant.USER_WAITING_TIME)
             
@@ -420,7 +481,7 @@ class YouTubeUploader:
             time.sleep(Constant.USER_WAITING_TIME)
             self.browser.save_cookies()
 
-    def __upload(self) -> (bool, Optional[str]):
+    def youtube_upload(self) -> (bool, Optional[str]):
         # self.browser.get(Constant.YOUTUBE_URL)
         # time.sleep(Constant.USER_WAITING_TIME)
         self.browser.get(Constant.YOUTUBE_UPLOAD_URL)

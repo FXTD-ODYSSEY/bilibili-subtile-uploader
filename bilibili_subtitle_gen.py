@@ -17,6 +17,7 @@ import re
 import sys
 import json
 import time
+import random
 import tempfile
 import requests
 import contextlib
@@ -90,75 +91,91 @@ class BccParserMixin(object):
         return bcc if subs else {}
 
     @staticmethod
-    def vtt2bcc(path, threshold=0.1):
+    def vtt2bcc(path, threshold=0.1, word=True):
         path = path if path else ""
         if os.path.exists(path):
             subs = pyvtt.open(path)
         else:
             subs = pyvtt.from_string(path)
-        # NOTE 按照 vtt 的断词模式分隔 bcc
+
         caption_list = []
-        for i, sub in enumerate(subs):
-            text = sub.text
+        if not word:
+            caption_list = [
+                {
+                    "from": sub.start.ordinal / 1000,
+                    "to": sub.end.ordinal / 1000,
+                    "location": 2,
+                    "content": sub.text_without_tags.split("\n")[-1],
+                }
+                for sub in subs
+            ]
+        else:
+            # NOTE 按照 vtt 的断词模式分隔 bcc
+            for i, sub in enumerate(subs):
+                text = sub.text
 
-            start = sub.start.ordinal / 1000
-            end = sub.end.ordinal / 1000
-            try:
-                idx = text.index("<")
-                pre_text = text[:idx]
-                regx = re.compile(r"<(.*?)><c>(.*?)</c>")
-                for t_str, match in regx.findall(text):
-                    pre_text += match
-                    t = datetime.strptime(t_str, r"%H:%M:%S.%f")
-                    sec = (
-                        t.hour * 3600
-                        + t.minute * 60
-                        + t.second
-                        + t.microsecond / 10 ** len((str(t.microsecond)))
-                    )
-                    final_text = pre_text.split("\n")[-1]
+                start = sub.start.ordinal / 1000
+                end = sub.end.ordinal / 1000
+                try:
+                    idx = text.index("<")
+                    pre_text = text[:idx]
+                    regx = re.compile(r"<(.*?)><c>(.*?)</c>")
+                    for t_str, match in regx.findall(text):
+                        pre_text += match
+                        t = datetime.strptime(t_str, r"%H:%M:%S.%f")
+                        sec = (
+                            t.hour * 3600
+                            + t.minute * 60
+                            + t.second
+                            + t.microsecond / 10 ** len((str(t.microsecond)))
+                        )
+                        final_text = pre_text.split("\n")[-1]
 
-                    if caption_list and (
-                        sec - start <= threshold
-                        or caption_list[-1]["content"] == final_text
-                    ):
+                        if caption_list and (
+                            sec - start <= threshold
+                            or caption_list[-1]["content"] == final_text
+                        ):
+                            caption_list[-1].update(
+                                {
+                                    "to": sec,
+                                    "content": final_text,
+                                }
+                            )
+                        else:
+                            caption_list.append(
+                                {
+                                    "from": start,
+                                    "to": sec,
+                                    "location": 2,
+                                    "content": final_text,
+                                }
+                            )
+                        start = sec
+                except:
+                    final_text = sub.text.split("\n")[-1]
+                    if caption_list and caption_list[-1]["content"] == final_text:
                         caption_list[-1].update(
                             {
-                                "to": sec,
+                                "to": end,
                                 "content": final_text,
                             }
                         )
                     else:
+                        if caption_list and end - start < threshold:
+                            start = caption_list[-1]["to"]
                         caption_list.append(
                             {
                                 "from": start,
-                                "to": sec,
+                                "to": end,
                                 "location": 2,
                                 "content": final_text,
                             }
                         )
-                    start = sec
-            except:
-                final_text = sub.text.split("\n")[-1]
-                if caption_list and caption_list[-1]["content"] == final_text:
-                    caption_list[-1].update(
-                        {
-                            "to": end,
-                            "content": final_text,
-                        }
-                    )
-                else:
-                    if caption_list and end - start < threshold:
-                        start = caption_list[-1]["to"]
-                    caption_list.append(
-                        {
-                            "from": start,
-                            "to": end,
-                            "location": 2,
-                            "content": final_text,
-                        }
-                    )
 
+        # print(len(caption_list))
+        # NOTE 避免超出视频长度
+        last = caption_list[-1]
+        last["to"] = last.get("from") + 0.1
         bcc = {
             "font_size": 0.4,
             "font_color": "#FFFFFF",
@@ -336,15 +353,6 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             Proxy_Frame.grid_columnconfigure(1, weight=1)
 
         with TKLabelFrame(
-            frame={"text": "AutoSub 生成机翻字幕"},
-            pack={"side": "top", "fill": "x", "padx": 5, "pady": 5},
-        ) as Trans_Frame:
-            pack_config = {"side": "top", "fill": "x", "padx": 15, "pady": 5}
-
-            gen_btn = tk.Button(Trans_Frame, text="自动生成并上传字幕", command=self.autoSub_run)
-            gen_btn.pack(side="top", fill="x", padx=5, pady=5)
-
-        with TKLabelFrame(
             frame={"text": "Youtube 上传视频获取机翻字幕"},
             pack={"side": "top", "fill": "x", "padx": 5, "pady": 5},
         ) as Youtube_Frame:
@@ -365,25 +373,27 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
                 entry = tk.Entry(Cookie_Frame, textvariable=self.youtube_cookie)
                 entry.grid(row=0, column=1, sticky="nsew")
                 Cookie_Frame.grid_columnconfigure(1, weight=1)
-                
+
             with TKFrame(Youtube_Frame, **pack_config) as Username_Frame:
                 text = "Yotube 用户名"
                 tk.Label(Username_Frame, text=text).grid(row=0, column=0, sticky="nsew")
                 entry = tk.Entry(Username_Frame, textvariable=self.youtube_username)
                 entry.grid(row=0, column=1, sticky="nsew")
                 Username_Frame.grid_columnconfigure(1, weight=1)
-                
+
             with TKFrame(Youtube_Frame, **pack_config) as Password_Frame:
                 text = "Yotube 登陆密码"
                 tk.Label(Password_Frame, text=text).grid(row=0, column=0, sticky="nsew")
-                entry = tk.Entry(Password_Frame, textvariable=self.youtube_password)
+                entry = tk.Entry(
+                    Password_Frame, show="*", textvariable=self.youtube_password
+                )
                 entry.grid(row=0, column=1, sticky="nsew")
                 Password_Frame.grid_columnconfigure(1, weight=1)
 
             gen_btn = tk.Button(
                 Youtube_Frame, text="上传 youtube 视频", command=self.youtube_selenium_run
             )
-            
+
             gen_btn.pack(side="top", fill="x", padx=5, pady=5)
 
             gen_btn = tk.Button(
@@ -391,6 +401,15 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
                 text="下载字幕 | 上传B站",
                 command=self.submit_youtube_subtitle_run,
             )
+            gen_btn.pack(side="top", fill="x", padx=5, pady=5)
+
+        with TKLabelFrame(
+            frame={"text": "AutoSub 生成机翻字幕"},
+            pack={"side": "top", "fill": "x", "padx": 5, "pady": 5},
+        ) as Trans_Frame:
+            pack_config = {"side": "top", "fill": "x", "padx": 15, "pady": 5}
+
+            gen_btn = tk.Button(Trans_Frame, text="自动生成并上传字幕", command=self.autoSub_run)
             gen_btn.pack(side="top", fill="x", padx=5, pady=5)
 
         with TKLabelFrame(
@@ -460,9 +479,41 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         def wrapper(self, *args, **kwargs):
             if not _check(self):
                 return
-            return func(self, *args, **kwargs)
+            res = func(self, *args, **kwargs)
+            msg = "处理完成"
+            print(msg)
+            tk.messagebox.showinfo("恭喜你", msg)
+            return res
 
         return wrapper
+
+    @staticmethod
+    def repair_filename(filename):
+        """ Ref : bilili utils/base.py """
+
+        def to_full_width_chr(matchobj):
+            char = matchobj.group(0)
+            full_width_char = chr(ord(char) + ord("？") - ord("?"))
+            return full_width_char
+
+        # 路径非法字符，转全角
+        regex_path = re.compile(r'[\\/:*?"<>|]')
+        # 空格类字符，转空格
+        regex_spaces = re.compile(r"\s+")
+        # 不可打印字符，移除
+        regex_non_printable = re.compile(
+            r"[\001\002\003\004\005\006\007\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+            r"\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a]"
+        )
+
+        filename = regex_path.sub(to_full_width_chr, filename)
+        filename = regex_spaces.sub(" ", filename)
+        filename = regex_non_printable.sub("", filename)
+        filename = filename.strip()
+        filename = (
+            filename if filename else "file_{:04}".format(random.randint(0, 9999))
+        )
+        return filename
 
     @check_variable.__func__
     def autoSub_run(self):
@@ -485,7 +536,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             self.download_video(bvid)
 
             # NOTE 修改视频名称为 oid
-            title = info.get("title").replace("&amp;", "&")
+            title = info.get("title")
             pages = info.get("pages")
 
             video = os.path.join(
@@ -572,10 +623,10 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
                         os.path.abspath(token),
                     ]
                 )
-                
+
                 # NOTE 上传到 youtube
                 res = subprocess.check_output(command)
-                
+
                 # NOTE 获取上传的 id
                 res = res.decode("utf-8")
                 regx = re.compile(r"Video ID: (.*)")
@@ -588,25 +639,25 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             output = os.path.join(self.youtube_folder, f"{bvid}.json")
             with open(output, "w") as f:
                 json.dump(youtube2oid, f, indent=4)
-                
-                
+
     @check_variable.__func__
     def youtube_selenium_run(self):
-        
-        uploader = YouTubeUploader('')
+
+        uploader = YouTubeUploader("")
         uploader.username = self.youtube_username.get()
         uploader.password = self.youtube_password.get()
+        uploader.youtube_login()
+
         for bvid in self.bvid_list:
             self.bvid = bvid
             output = os.path.join(self.youtube_folder, f"{bvid}.json")
             data = {}
             if os.path.exists(output):
-                with open(output, 'r') as f:
+                with open(output, "r") as f:
                     data = json.load(f)
-                    data = {v:k for k,v in data.items()}
+                    data = {v: k for k, v in data.items()}
 
             info = self.get_video_info(bvid)
-
             # NOTE 下载视频
             self.download_video(bvid)
 
@@ -619,6 +670,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             )
 
             youtube2oid = {}
+            info["youtube2oid"] = youtube2oid
             for p, oid in pages.items():
                 src = os.path.join(video, f"{p}.mp4")
                 if not os.path.isfile(src):
@@ -627,21 +679,20 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
                 elif data.get(oid):
                     print(f"{oid} 已经上传到 Youtube - 跳过")
                     continue
-                
+
                 uploader.video_path = src
-                was_video_uploaded, youtube_id = uploader.upload()
+                was_video_uploaded, youtube_id = uploader.youtube_upload()
                 if was_video_uploaded:
                     youtube2oid[youtube_id] = oid
                     print(f"{youtube_id} 上传成功")
 
-                with open(output, "w") as f:
-                    json.dump(youtube2oid, f, indent=4)
-        
+                self.dump_dict(info, path=output, indent=4)
+
         uploader.quit()
-        print("视频上传完成")
 
     @check_variable.__func__
     def submit_youtube_subtitle_run(self):
+
         for j in os.listdir(self.youtube_folder):
             if not j.endswith(".json"):
                 continue
@@ -649,25 +700,84 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             output = os.path.join(self.youtube_folder, j)
             self.bvid = j[:-5]
             with open(output, "r") as f:
-                data = json.load(f)
-                if data.get("upload"):
+                info = json.load(f)
+                if info.get("upload"):
                     continue
 
             print(f"上传 {j}")
+            youtube2oid = info.get("youtube2oid")
 
+            for youtube_id, oid in youtube2oid.items():
+                if self.upload_bilibili_subtitle(youtube_id, oid):
+                    break
+                if not self.youtube_cn.get():
+                    continue
+                elif self.upload_bilibili_subtitle(youtube_id, oid, zh=True):
+                    break
+            else:
+                info["upload"] = True
+                self.dump_dict(info, path=output, indent=4)
+
+    def upload_bilibili_subtitle(self, youtube_id, oid, zh=False):
+        cookie = self.youtube_cookie.get()
+        vtt = self.get_youtube_vtt(youtube_id, cookie, zh=zh)
+        if not vtt:
+            return True
+        subtitle = self.vtt2bcc(vtt)
+        text = self.submit_subtitle(subtitle, oid)
+        if text != '{"code":0,"message":"0","ttl":1,"data":null}':
+            subtitle = self.vtt2bcc(vtt, word=False)
+            text = self.submit_subtitle(subtitle, oid)
+        print(f"{'【中文】' if zh else '【英文】'} {self.bvid} {oid} -> {text}")
+
+    # @check_variable.__func__
+    def submit_youtube_subtitle_selenium_run(self):
+        uploader = YouTubeUploader("")
+        uploader.bilibili_login()
+        for j in os.listdir(self.youtube_folder):
+            if not j.endswith(".json"):
+                continue
+
+            output = os.path.join(self.youtube_folder, j)
+            self.bvid = j[:-5]
+            with open(output, "r") as f:
+                info = json.load(f)
+                if info.get("upload"):
+                    continue
+
+            print(f"上传 {j}")
+            youtube2oid = info.get("youtube2oid")
             cookie = self.youtube_cookie.get()
-            for youtube_id, oid in data.items():
+            flag = True
+            for youtube_id, oid in youtube2oid.items():
                 vtt = self.get_youtube_vtt(youtube_id, cookie)
+                if not vtt:
+                    flag = False
+                    break
                 subtitle = self.vtt2bcc(vtt)
-                self.submit_subtitle(subtitle, oid)
+                path = self.dump_dict(subtitle)
+                uploader.bilibili_upload(self.bvid, oid, path)
                 if self.youtube_cn.get():
                     vtt = self.get_youtube_vtt(youtube_id, cookie, zh=True)
+                    if not vtt:
+                        flag = False
+                        break
                     subtitle = self.vtt2bcc(vtt)
-                    self.submit_subtitle(subtitle, oid, lang="zh-CN")
+                    path = self.dump_dict(subtitle)
+                    uploader.bilibili_upload(self.bvid, oid, path, zh=True)
 
-            data["upload"] = True
-            with open(output, "w") as f:
-                json.dump(data, f, indent=4)
+            if flag:
+                info["upload"] = flag
+                self.dump_dict(info, path=output, indent=4)
+
+        uploader.quit()
+
+    @staticmethod
+    def dump_dict(subtitle, path="", indent=None):
+        path = path if path else os.path.join(os.getcwd(), "temp.bcc")
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(subtitle, f, ensure_ascii=False, indent=indent)
+        return path
 
     def get_youtube_vtt(
         self, youtube_id, youtube_cookie="", zh=False, count=0, max_count=4
@@ -701,8 +811,8 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         if not regx:
             count += 1
             print(f"fail to find {youtube_id} subtitle , Retry Count {count} ...")
-            time.sleep(3)
-            return self.get_youtube_vtt(youtube_id, youtube_cookie, zh, count)
+            # time.sleep(3)
+            return ""
 
         url = regx.group(1).replace(r"\u0026", "&")
         url += "&fmt=vtt"
@@ -768,10 +878,11 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
 
         response = requests.request("GET", url)
 
-        data = json.loads(response.text.encode("utf8")).get("data", {})
+        data = response.json().get("data", {})
+        # data = json.loads(response.text).get("data", {})
 
         return {
-            "title": data.get("title"),
+            "title": self.repair_filename(data.get("title", "")),
             "pages": {p.get("part"): p.get("cid") for p in data.get("pages", {})},
         }
 
@@ -821,8 +932,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         url = "https://api.bilibili.com/x/v2/dm/subtitle/draft/save"
         response = requests.request("POST", url, headers=headers, data=payload)
 
-        res = response.text
-        print(f"{bvid} {oid} -> {res}")
+        return response.text
 
 
 if __name__ == "__main__":

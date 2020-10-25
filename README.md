@@ -9,6 +9,8 @@ auto upload caption
 [selenium 上传 yotuube 视频](https://github.com/linouk23/youtube_uploader_selenium) 
 
 > youtube 上传视频用浏览器自动化可以上传更多视频
+> 这里借助的 selenium_firefox 进行控制
+> 必须安装 火狐浏览器 并且下载 geckodriver.exe 驱动器环境变量路径来通过 selenium 控制浏览器
 
 TOOD
 - [x] 通过 bilili  自动下载链接的视频
@@ -22,7 +24,7 @@ TOOD
 - [x] youtube Private 视频字幕下载测试
 - [x] youtube vtt 字幕转 bcc (保留逐字出现效果)
 - [x] youtube selenium 上传
-- [ ] bilibili selenium 上传
+- [x] bilibili selenium 上传 （然而 B 站有上传大小限制 (逐字出现很容易超出限制) | 和使用接口的效果差不多）
 
 # API 链接 
 

@@ -37,7 +37,7 @@ class BccParserMixin(object):
         return bcc if subs else {}
 
     @staticmethod
-    def vtt2bcc(path,threshold=0.1,word=True):
+    def vtt2bcc(path, threshold=0.1, word=True):
         path = path if path else ""
         if os.path.exists(path):
             subs = pyvtt.open(path)
@@ -117,10 +117,10 @@ class BccParserMixin(object):
                             }
                         )
 
+        # print(len(caption_list))
         # NOTE 避免超出视频长度
         last = caption_list[-1]
-        last["to"] = last.get("from") + .1
-        print(len(caption_list))
+        last["to"] = last.get("from") + 0.1
         bcc = {
             "font_size": 0.4,
             "font_color": "#FFFFFF",
@@ -136,7 +136,7 @@ class BccParserMixin(object):
 from urllib import parse
 
 path = "test/test.vtt"
-bcc = BccParserMixin.vtt2bcc(path,word=1)
+bcc = BccParserMixin.vtt2bcc(path, word=0)
 # print(bcc)
 with open("test/test.bcc", "w", encoding="utf-8") as f:
     json.dump(bcc, f, ensure_ascii=False)
