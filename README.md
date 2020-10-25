@@ -26,6 +26,11 @@ TOOD
 - [x] youtube selenium 上传
 - [x] bilibili selenium 上传 （然而 B 站有上传大小限制 (逐字出现很容易超出限制) | 和使用接口的效果差不多）
 
+
+> 工具启动界面如下↓↓↓
+
+
+
 # API 链接 
 
 API 索引参考 [bilibili-API-collect](https://github.com/SocialSisterYi/bilibili-API-collect)    

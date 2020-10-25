@@ -443,7 +443,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             self.help_win.destroy()
         self.help_win = tk.Toplevel(self.parent)
         self.help_win.title("使用说明")
-        text = "Cookie 通过登陆在浏览器控制台中获取"
+        text = "网站的 Cookie 信息可以通过安装 EditThisCookie 浏览器插件获取"
         tk.Label(self.help_win, text=text).pack(side="top", fill="x", padx=5, pady=5)
         text = "自动将 srt 字幕转换为 bcc 字幕上传到 B 站"
         tk.Label(self.help_win, text=text).pack(side="top", fill="x", padx=5, pady=5)
@@ -513,7 +513,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         filename = (
             filename if filename else "file_{:04}".format(random.randint(0, 9999))
         )
-        return filename
+        return filename.replace("&", "&amp;")
 
     @check_variable.__func__
     def autoSub_run(self):
@@ -600,7 +600,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             self.download_video(bvid)
 
             # NOTE 修改视频名称为 oid
-            title = info.get("title").replace("&amp;", "&")
+            title = info.get("title")
             pages = info.get("pages")
 
             video = os.path.join(
@@ -640,6 +640,15 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             with open(output, "w") as f:
                 json.dump(youtube2oid, f, indent=4)
 
+    @staticmethod
+    def check_bvid_json(output):
+        data = {}
+        if os.path.exists(output):
+            with open(output, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                data = {v: k for k, v in data.get("youtube2oid", {}).items()}
+        return data
+
     @check_variable.__func__
     def youtube_selenium_run(self):
 
@@ -651,18 +660,17 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         for bvid in self.bvid_list:
             self.bvid = bvid
             output = os.path.join(self.youtube_folder, f"{bvid}.json")
-            data = {}
-            if os.path.exists(output):
-                with open(output, "r") as f:
-                    data = json.load(f)
-                    data = {v: k for k, v in data.items()}
+            data = self.check_bvid_json(output)
+            if not data:
+                output = os.path.join(self.youtube_folder, "upload", f"{bvid}.json")
+                data = self.check_bvid_json(output)
 
             info = self.get_video_info(bvid)
             # NOTE 下载视频
             self.download_video(bvid)
 
             # NOTE 修改视频名称为 oid
-            title = info.get("title").replace("&amp;", "&")
+            title = info.get("title")
             pages = info.get("pages")
 
             video = os.path.join(
@@ -699,10 +707,15 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
 
             output = os.path.join(self.youtube_folder, j)
             self.bvid = j[:-5]
-            with open(output, "r") as f:
+            with open(output, "r", encoding="utf-8") as f:
                 info = json.load(f)
-                if info.get("upload"):
-                    continue
+            if info.get("upload"):
+                upload = os.path.join(self.youtube_folder, "upload")
+                if not os.path.exists(upload):
+                    os.mkdir(upload)
+                location = os.path.join(upload, os.path.basename(output))
+                os.rename(output, location)
+                continue
 
             print(f"上传 {j}")
             youtube2oid = info.get("youtube2oid")
@@ -724,10 +737,11 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         if not vtt:
             return True
         subtitle = self.vtt2bcc(vtt)
-        text = self.submit_subtitle(subtitle, oid)
+        lang = "zh-CN" if zh else "en-US"
+        text = self.submit_subtitle(subtitle, oid, lang=lang)
         if text != '{"code":0,"message":"0","ttl":1,"data":null}':
             subtitle = self.vtt2bcc(vtt, word=False)
-            text = self.submit_subtitle(subtitle, oid)
+            text = self.submit_subtitle(subtitle, oid, lang=lang)
         print(f"{'【中文】' if zh else '【英文】'} {self.bvid} {oid} -> {text}")
 
     # @check_variable.__func__
