@@ -25,11 +25,13 @@ TOOD
 - [x] youtube vtt 字幕转 bcc (保留逐字出现效果)
 - [x] youtube selenium 上传
 - [x] bilibili selenium 上传 （然而 B 站有上传大小限制 (逐字出现很容易超出限制) | 和使用接口的效果差不多）
+- [ ] 自动获取账户下的 bvid 进行上传
+- [ ] youtube 字幕上传失败用 fail 进行记录
+- [ ] 定时自动执行
 
 
 > 工具启动界面如下↓↓↓
-
-
+![alt](https://cdn.jsdelivr.net/gh/FXTD-odyssey/FXTD-odyssey.github.io@master/post_img/55790015/01.png)
 
 # API 链接 
 

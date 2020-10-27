@@ -275,7 +275,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         tk.Frame.__init__(self, parent, *args, **kwargs)
         self.parent = parent
         self.help_win = None
-        self.youtube_folder = os.path.join(__file__, "..", "youtube2oid")
+        self.youtube_folder = os.path.join(__file__, "..", "oid2youtube")
         if not os.path.isdir(self.youtube_folder):
             os.mkdir(self.youtube_folder)
         parent.title("BiliBili 字幕上传工具")
@@ -569,76 +569,76 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
 
         tk.messagebox.showinfo("恭喜你", "字幕上传成功")
 
-    @check_variable.__func__
-    def youtube_run(self):
-        youtube = os.path.join(__file__, "..", "youtube")
-        youtubeuploader = os.path.join(youtube, "youtubeuploader.exe")
-        secrets = os.path.join(youtube, "client_secrets.json")
-        token = os.path.join(youtube, "request.token")
+    # @check_variable.__func__
+    # def youtube_run(self):
+    #     youtube = os.path.join(__file__, "..", "youtube")
+    #     youtubeuploader = os.path.join(youtube, "youtubeuploader.exe")
+    #     secrets = os.path.join(youtube, "client_secrets.json")
+    #     token = os.path.join(youtube, "request.token")
 
-        if not os.path.exists(youtubeuploader):
-            msg = f"{youtubeuploader} 路径不存在"
-            print(msg)
-            tk.messagebox.showwarning("警告", msg)
-            return
-        elif not os.path.exists(token):
-            msg = f"{token} 路径不存在"
-            print(msg)
-            tk.messagebox.showwarning("警告", msg)
-            return
-        elif not os.path.exists(secrets):
-            msg = f"{secrets} 路径不存在"
-            print(msg)
-            tk.messagebox.showwarning("警告", msg)
-            return
+    #     if not os.path.exists(youtubeuploader):
+    #         msg = f"{youtubeuploader} 路径不存在"
+    #         print(msg)
+    #         tk.messagebox.showwarning("警告", msg)
+    #         return
+    #     elif not os.path.exists(token):
+    #         msg = f"{token} 路径不存在"
+    #         print(msg)
+    #         tk.messagebox.showwarning("警告", msg)
+    #         return
+    #     elif not os.path.exists(secrets):
+    #         msg = f"{secrets} 路径不存在"
+    #         print(msg)
+    #         tk.messagebox.showwarning("警告", msg)
+    #         return
 
-        for bvid in self.bvid_list:
-            self.bvid = bvid
-            info = self.get_video_info(bvid)
+    #     for bvid in self.bvid_list:
+    #         self.bvid = bvid
+    #         info = self.get_video_info(bvid)
 
-            # NOTE 下载视频
-            self.download_video(bvid)
+    #         # NOTE 下载视频
+    #         self.download_video(bvid)
 
-            # NOTE 修改视频名称为 oid
-            title = info.get("title")
-            pages = info.get("pages")
+    #         # NOTE 修改视频名称为 oid
+    #         title = info.get("title")
+    #         pages = info.get("pages")
 
-            video = os.path.join(
-                __file__, "..", "video", f"{title} - bilibili", "Videos"
-            )
+    #         video = os.path.join(
+    #             __file__, "..", "video", f"{title} - bilibili", "Videos"
+    #         )
 
-            youtube2oid = {}
-            for p, oid in pages.items():
-                src = os.path.join(video, f"{p}.mp4")
-                if not os.path.isfile(src):
-                    continue
-                command = " ".join(
-                    [
-                        os.path.abspath(youtubeuploader),
-                        "-filename",
-                        f'"{os.path.abspath(src)}"',
-                        "-secrets",
-                        os.path.abspath(secrets),
-                        "-cache",
-                        os.path.abspath(token),
-                    ]
-                )
+    #         oid2youtube = {}
+    #         for p, oid in pages.items():
+    #             src = os.path.join(video, f"{p}.mp4")
+    #             if not os.path.isfile(src):
+    #                 continue
+    #             command = " ".join(
+    #                 [
+    #                     os.path.abspath(youtubeuploader),
+    #                     "-filename",
+    #                     f'"{os.path.abspath(src)}"',
+    #                     "-secrets",
+    #                     os.path.abspath(secrets),
+    #                     "-cache",
+    #                     os.path.abspath(token),
+    #                 ]
+    #             )
 
-                # NOTE 上传到 youtube
-                res = subprocess.check_output(command)
+    #             # NOTE 上传到 youtube
+    #             res = subprocess.check_output(command)
 
-                # NOTE 获取上传的 id
-                res = res.decode("utf-8")
-                regx = re.compile(r"Video ID: (.*)")
-                grp = regx.search(res)
-                if grp:
-                    youtube_id = grp.group(1)
-                    youtube2oid[youtube_id] = oid
-                    print(f"{youtube_id} 上传成功")
+    #             # NOTE 获取上传的 id
+    #             res = res.decode("utf-8")
+    #             regx = re.compile(r"Video ID: (.*)")
+    #             grp = regx.search(res)
+    #             if grp:
+    #                 youtube_id = grp.group(1)
+    #                 oid2youtube[oid] = youtube_id
+    #                 print(f"{youtube_id} 上传成功")
 
-            output = os.path.join(self.youtube_folder, f"{bvid}.json")
-            with open(output, "w") as f:
-                json.dump(youtube2oid, f, indent=4)
+    #         output = os.path.join(self.youtube_folder, f"{bvid}.json")
+    #         with open(output, "w") as f:
+    #             json.dump(oid2youtube, f, indent=4)
 
     @staticmethod
     def check_bvid_json(output):
@@ -646,7 +646,6 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         if os.path.exists(output):
             with open(output, "r", encoding="utf-8") as f:
                 data = json.load(f)
-                data = {v: k for k, v in data.get("youtube2oid", {}).items()}
         return data
 
     @check_variable.__func__
@@ -662,36 +661,47 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             output = os.path.join(self.youtube_folder, f"{bvid}.json")
             data = self.check_bvid_json(output)
             if not data:
-                output = os.path.join(self.youtube_folder, "upload", f"{bvid}.json")
-                data = self.check_bvid_json(output)
-
+                _output = os.path.join(self.youtube_folder, "upload", f"{bvid}.json")
+                data = self.check_bvid_json(_output)
+            
             info = self.get_video_info(bvid)
-            # NOTE 下载视频
-            self.download_video(bvid)
-
             # NOTE 修改视频名称为 oid
             title = info.get("title")
             pages = info.get("pages")
-
+            
             video = os.path.join(
                 __file__, "..", "video", f"{title} - bilibili", "Videos"
             )
+            
+            oid2youtube = data.get("oid2youtube",{})
+            flag = True
+            for p, oid in pages.items():
+                src = os.path.join(video, f"{p}.mp4")
+                if oid2youtube.get(oid):
+                    print(f"{oid} 已经上传到 Youtube - 跳过")
+                    pages.pop(p)
+                else:
+                    flag = False
+                    
+            # NOTE 如果全部上传则跳过执行
+            if flag:
+                continue
+            
+            # NOTE 下载视频
+            self.download_video(bvid)
 
-            youtube2oid = {}
-            info["youtube2oid"] = youtube2oid
+            oid2youtube = {}
+            info["oid2youtube"] = oid2youtube
             for p, oid in pages.items():
                 src = os.path.join(video, f"{p}.mp4")
                 if not os.path.isfile(src):
                     print(f"{src} 视频源找不到 - 跳过")
                     continue
-                elif data.get(oid):
-                    print(f"{oid} 已经上传到 Youtube - 跳过")
-                    continue
-
+                
                 uploader.video_path = src
                 was_video_uploaded, youtube_id = uploader.youtube_upload()
                 if was_video_uploaded:
-                    youtube2oid[youtube_id] = oid
+                    oid2youtube[oid] = youtube_id
                     print(f"{youtube_id} 上传成功")
 
                 self.dump_dict(info, path=output, indent=4)
@@ -700,27 +710,37 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
 
     @check_variable.__func__
     def submit_youtube_subtitle_run(self):
-
+        
+        upload = os.path.join(self.youtube_folder, "upload")
+        if not os.path.exists(upload):
+            os.mkdir(upload)
+            
         for j in os.listdir(self.youtube_folder):
             if not j.endswith(".json"):
                 continue
-
+            
             output = os.path.join(self.youtube_folder, j)
+            location = os.path.join(upload, os.path.basename(output))
+
             self.bvid = j[:-5]
             with open(output, "r", encoding="utf-8") as f:
                 info = json.load(f)
-            if info.get("upload"):
-                upload = os.path.join(self.youtube_folder, "upload")
-                if not os.path.exists(upload):
-                    os.mkdir(upload)
-                location = os.path.join(upload, os.path.basename(output))
-                os.rename(output, location)
+            
+            # NOTE 检查是不是视频都上传完成了
+            for p,oid in info.get("pages").items():
+                if not info.get("oid2youtube").get(oid):
+                    break
+            else:
+                print(f"跳过 {j}")
+                # NOTE 如果上传完了判断是已经上传到B站了
+                if info.get("upload"):
+                    os.rename(output, location)
                 continue
 
             print(f"上传 {j}")
-            youtube2oid = info.get("youtube2oid")
+            oid2youtube = info.get("oid2youtube")
 
-            for youtube_id, oid in youtube2oid.items():
+            for oid, youtube_id in oid2youtube.items():
                 if self.upload_bilibili_subtitle(youtube_id, oid):
                     break
                 if not self.youtube_cn.get():
@@ -730,6 +750,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             else:
                 info["upload"] = True
                 self.dump_dict(info, path=output, indent=4)
+                os.rename(output, location)
 
     def upload_bilibili_subtitle(self, youtube_id, oid, zh=False):
         cookie = self.youtube_cookie.get()
@@ -760,10 +781,10 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
                     continue
 
             print(f"上传 {j}")
-            youtube2oid = info.get("youtube2oid")
+            oid2youtube = info.get("oid2youtube")
             cookie = self.youtube_cookie.get()
             flag = True
-            for youtube_id, oid in youtube2oid.items():
+            for oid, youtube_id in oid2youtube.items():
                 vtt = self.get_youtube_vtt(youtube_id, cookie)
                 if not vtt:
                     flag = False

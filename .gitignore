@@ -7,6 +7,6 @@ autosub/
 youtube/request.token
 youtube/client_secrets.json
 youtube/youtubeuploader.exe
-youtube2oid/
+oid2youtube/
 *.log
 *.pkl
