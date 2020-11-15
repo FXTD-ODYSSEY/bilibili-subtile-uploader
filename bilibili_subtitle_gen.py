@@ -16,7 +16,7 @@ import os
 import re
 import sys
 import json
-import time
+import copy
 import random
 import tempfile
 import requests
@@ -408,7 +408,6 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             pack={"side": "top", "fill": "x", "padx": 5, "pady": 5},
         ) as Trans_Frame:
             pack_config = {"side": "top", "fill": "x", "padx": 15, "pady": 5}
-
             gen_btn = tk.Button(Trans_Frame, text="自动生成并上传字幕", command=self.autoSub_run)
             gen_btn.pack(side="top", fill="x", padx=5, pady=5)
 
@@ -513,7 +512,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         filename = (
             filename if filename else "file_{:04}".format(random.randint(0, 9999))
         )
-        return filename.replace("&", "&amp;")
+        return filename.replace("&", "&amp;").replace('  ',' ')
 
     @check_variable.__func__
     def autoSub_run(self):
@@ -646,6 +645,12 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         if os.path.exists(output):
             with open(output, "r", encoding="utf-8") as f:
                 data = json.load(f)
+        else:
+            directory,name = os.path.split(output)
+            output = os.path.join(directory,"upload",name)
+            if os.path.exists(output):
+                with open(output, "r", encoding="utf-8") as f:
+                    data = json.load(f)
         return data
 
     @check_variable.__func__
@@ -655,14 +660,19 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         uploader.username = self.youtube_username.get()
         uploader.password = self.youtube_password.get()
         uploader.youtube_login()
-
+    
         for bvid in self.bvid_list:
             self.bvid = bvid
             output = os.path.join(self.youtube_folder, f"{bvid}.json")
             data = self.check_bvid_json(output)
-            if not data:
-                _output = os.path.join(self.youtube_folder, "upload", f"{bvid}.json")
-                data = self.check_bvid_json(_output)
+            if data.get("upload"):
+                print("uploaded ",self.bvid)
+                continue
+            # if not data:
+            #     print("ignore ",self.bvid)
+            #     continue
+                # _output = os.path.join(self.youtube_folder, "upload", f"{bvid}.json")
+                # data = self.check_bvid_json(_output)
             
             info = self.get_video_info(bvid)
             # NOTE 修改视频名称为 oid
@@ -674,25 +684,22 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             )
             
             oid2youtube = data.get("oid2youtube",{})
-            flag = True
-            for p, oid in pages.items():
-                src = os.path.join(video, f"{p}.mp4")
-                if oid2youtube.get(oid):
-                    print(f"{oid} 已经上传到 Youtube - 跳过")
-                    pages.pop(p)
-                else:
-                    flag = False
-                    
-            # NOTE 如果全部上传则跳过执行
-            if flag:
+            # NOTE json 获取的 字符串 oid 是数字需要转换
+            page_dict = {p:oid for p, oid in pages.items() if not oid2youtube.get(str(oid))}
+            # NOTE 如果为空说明 已经上传过了
+            if not page_dict:
                 continue
             
-            # NOTE 下载视频
-            self.download_video(bvid)
+            
+            for p, oid in page_dict.items():
+                src = os.path.join(video, f"{p}.mp4")
+                if not os.path.isfile(src):
+                    # NOTE 下载视频
+                    self.download_video(bvid)
+                    break
 
-            oid2youtube = {}
             info["oid2youtube"] = oid2youtube
-            for p, oid in pages.items():
+            for p, oid in page_dict.items():
                 src = os.path.join(video, f"{p}.mp4")
                 if not os.path.isfile(src):
                     print(f"{src} 视频源找不到 - 跳过")
@@ -703,7 +710,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
                 if was_video_uploaded:
                     oid2youtube[oid] = youtube_id
                     print(f"{youtube_id} 上传成功")
-
+                
                 self.dump_dict(info, path=output, indent=4)
 
         uploader.quit()
@@ -750,6 +757,8 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             else:
                 info["upload"] = True
                 self.dump_dict(info, path=output, indent=4)
+                if os.path.exists(location):
+                    os.remove(location)
                 os.rename(output, location)
 
     def upload_bilibili_subtitle(self, youtube_id, oid, zh=False):
@@ -777,8 +786,8 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             self.bvid = j[:-5]
             with open(output, "r") as f:
                 info = json.load(f)
-                if info.get("upload"):
-                    continue
+            if info.get("upload"):
+                continue
 
             print(f"上传 {j}")
             oid2youtube = info.get("oid2youtube")
@@ -918,7 +927,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
 
         return {
             "title": self.repair_filename(data.get("title", "")),
-            "pages": {p.get("part"): p.get("cid") for p in data.get("pages", {})},
+            "pages": {self.repair_filename(p.get("part")): p.get("cid") for p in data.get("pages", {})},
         }
 
     def download_video(self, bvid):
