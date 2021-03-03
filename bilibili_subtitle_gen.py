@@ -34,6 +34,11 @@ from tkinter import filedialog, messagebox
 
 from selenium_firefox import YouTubeUploader
 
+import selenium_firefox
+
+
+
+
 LANG_LIST = [
     "en-US",
     "zh-CN",
@@ -700,6 +705,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
 
             info["oid2youtube"] = oid2youtube
             for p, oid in page_dict.items():
+                p = p.replace("&amp;","&")
                 src = os.path.join(video, f"{p}.mp4")
                 if not os.path.isfile(src):
                     print(f"{src} 视频源找不到 - 跳过")
@@ -707,11 +713,10 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
                 
                 uploader.video_path = src
                 was_video_uploaded, youtube_id = uploader.youtube_upload()
-                if was_video_uploaded:
+                if was_video_uploaded and youtube_id:
                     oid2youtube[oid] = youtube_id
                     print(f"{youtube_id} 上传成功")
-                
-                self.dump_dict(info, path=output, indent=4)
+                    self.dump_dict(info, path=output, indent=4)
 
         uploader.quit()
 
@@ -748,24 +753,32 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             oid2youtube = info.get("oid2youtube")
 
             for oid, youtube_id in oid2youtube.items():
-                if self.upload_bilibili_subtitle(youtube_id, oid):
-                    break
-                if not self.youtube_cn.get():
-                    continue
-                elif self.upload_bilibili_subtitle(youtube_id, oid, zh=True):
-                    break
-            else:
-                info["upload"] = True
-                self.dump_dict(info, path=output, indent=4)
-                if os.path.exists(location):
-                    os.remove(location)
-                os.rename(output, location)
+                if not self.upload_bilibili_subtitle(youtube_id, oid):
+                    if not info.get("fail"):
+                        info["fail"] = {}
+                    if not info["fail"].get(oid):
+                        info["fail"][oid] = [youtube_id]
+                    info["fail"][oid].append("en_US")
+                # if not self.youtube_cn.get():
+                #     continue
+                elif not self.upload_bilibili_subtitle(youtube_id, oid, zh=True):
+                    if not info.get("fail"):
+                        info["fail"] = {}
+                    if not info["fail"].get(oid):
+                        info["fail"][oid] = [youtube_id]
+                    info["fail "][oid].append("zh_CN")
+                
+            info["upload"] = True
+            self.dump_dict(info, path=output, indent=4)
+            if os.path.exists(location):
+                os.remove(location)
+            os.rename(output, location)
 
     def upload_bilibili_subtitle(self, youtube_id, oid, zh=False):
         cookie = self.youtube_cookie.get()
         vtt = self.get_youtube_vtt(youtube_id, cookie, zh=zh)
         if not vtt:
-            return True
+            return False
         subtitle = self.vtt2bcc(vtt)
         lang = "zh-CN" if zh else "en-US"
         text = self.submit_subtitle(subtitle, oid, lang=lang)
@@ -773,6 +786,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
             subtitle = self.vtt2bcc(vtt, word=False)
             text = self.submit_subtitle(subtitle, oid, lang=lang)
         print(f"{'【中文】' if zh else '【英文】'} {self.bvid} {oid} -> {text}")
+        return True
 
     # @check_variable.__func__
     def submit_youtube_subtitle_selenium_run(self):
@@ -849,6 +863,11 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
         response = requests.request("GET", url, headers=headers)
 
         html = response.text
+        
+        # with open("test.txt",'w') as f:
+        #     f.write(html)
+        # raise RuntimeError
+        
         pattern = re.escape(r'"captionTracks":[{"baseUrl":')
         regx = re.search(f'{pattern}"(.*?)"', html)
 
@@ -978,8 +997,7 @@ class BiliBili_SubtitleGenerator(tk.Frame, ConfigDumperMixin, BccParserMixin):
 
         return response.text
 
-
 if __name__ == "__main__":
     root = tk.Tk()
-    BiliBili_SubtitleGenerator(root)
+    uploader = BiliBili_SubtitleGenerator(root)
     root.mainloop()
